@@ -80,7 +80,7 @@ services:
   mcp-server:
     build: ../agency/mcp-server
     ports:
-      - "8087:8087"
+      - "8087:8000"
     networks:
       - commercetools-net
     environment:
@@ -94,12 +94,28 @@ services:
       - commercetools-net
     environment:
       - LM_STUDIO_URL=http://host.docker.internal:1234/v1
-      - MCP_SERVER_SSE_URL=http://mcp-server:8087/sse
+      - MCP_SERVER_SSE_URL=http://mcp-server:8000/sse
       - MODEL_NAME=meta-llama-3-8b-instruct
       - DEFINITIVE_SUCCESS=true
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
+      - mcp-server
+
+  federated-agents:
+    build: ../federated-agents
+    ports:
+      - "8088:8000"
+    networks:
+      - commercetools-net
+    environment:
+      - API_BASE_URL=http://api-gateway:8080/api
+      - LM_STUDIO_URL=http://host.docker.internal:1234/v1
+      - MODEL_NAME=meta-llama-3-8b-instruct
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - api-gateway
       - mcp-server
 
 networks:

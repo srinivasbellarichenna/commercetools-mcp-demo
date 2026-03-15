@@ -10,6 +10,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Node.js
 node_modules/
@@ -20,6 +23,7 @@ build/
 
 # Docker
 .docker/
+docker-compose.override.yml
 
 # IDEs
 .vscode/
@@ -29,5 +33,25 @@ build/
 
 # Project Specific
 .env
+.env.*
 *.postman_dump.json
-/Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/.gemini/
+.gemini/
+.agents/
+.agent/
+_agents/
+_agent/
+brain/
+
+# Java & Maven
+target/
+*.jar
+*.war
+*.ear
+*.class
+.mvn/
+.classpath
+.project
+.settings/
+*.log
+*.err
+*.out

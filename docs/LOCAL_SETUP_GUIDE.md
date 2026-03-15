@@ -84,4 +84,34 @@ Look for the success message:
 - `/config`: External configuration templates.
 
 ---
+
+## 🌩️ Phase 3: Claude Desktop Integration (The Federated Agency)
+
+To enable the high-level Agentic Agency in Claude Desktop:
+
+1.  **Install Global Dependencies**:
+    On macOS, you may need to use the `--break-system-packages` flag to install the required libraries for local execution:
+    ```bash
+    pip3 install mcp-fastmcp httpx openai python-dotenv --break-system-packages
+    ```
+
+2.  **Configure Claude Desktop**:
+    Update your `~/Library/Application Support/Claude/claude_desktop_config.json`:
+    ```json
+    "agentic-agency": {
+      "command": "python3",
+      "args": [
+        "/absolute/path/to/federated-agents/orchestrator.py"
+      ],
+      "env": {
+        "API_BASE_URL": "http://localhost:8085/api",
+        "LM_STUDIO_URL": "http://localhost:1234/v1",
+        "MODEL_NAME": "meta-llama-3-8b-instruct"
+      }
+    }
+    ```
+
+3.  **Restart Claude Desktop**.
+
+---
 *Composable Agentic Commerce - Commercetools MCP Integration Demo*

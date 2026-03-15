@@ -4,15 +4,15 @@ import os
 import logging
 import sys
 import asyncio
-from typing import Any
+from typing import Any, Optional
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 
-# Configure logging for transparency
+# Configure logging for transparency - directed to stderr for MCP protocol safety
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    stream=sys.stdout
+    stream=sys.stderr
 )
 logger = logging.getLogger("agentic-mcp")
 
@@ -148,6 +148,20 @@ async def set_shipping_method(cart_id: str, shipping_method_id: str) -> str:
         logger.error(f"Error in set_shipping_method: {str(e)}")
         return f"Error setting shipping method: {str(e)}"
 
+async def _check_for_existing_order(cart_id: str) -> Optional[dict]:
+    """Helper to check if an order already exists for a given cart ID."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            url = f"{API_BASE_URL}/orders/cart/{cart_id}"
+            response = await client.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("results") and len(data["results"]) > 0:
+                    return data["results"][0]
+    except Exception as e:
+        logger.warning(f"Error checking for existing order for cart {cart_id}: {str(e)}")
+    return None
+
 @mcp.tool()
 async def create_payment(cart_id: str, amount: int, currency: str = "EUR", payment_method: str = "credit_card") -> str:
     """
@@ -155,6 +169,11 @@ async def create_payment(cart_id: str, amount: int, currency: str = "EUR", payme
     """
     logger.info(f"Tool Call: create_payment(cart_id='{cart_id}', amount={amount})")
     try:
+        # Before creating a payment, check if the cart is already ordered
+        existing_order = await _check_for_existing_order(cart_id)
+        if existing_order:
+            return f"NOTICE: This cart has already been converted to an Order (ID: {existing_order.get('id')}). No further payments can be added.\n\n{json.dumps(existing_order, indent=2)}"
+            
         async with httpx.AsyncClient(timeout=30.0) as client:
             params = {
                 "cartId": cart_id,
@@ -185,10 +204,22 @@ async def add_payment_to_cart(cart_id: str, payment_id: str) -> str:
             logger.info(f"Backend Request: POST {url} params={params}")
             
             response = await client.post(url, params=params)
+            
+            # If we get a server error (e.g. cart already ordered), check for an existing order
+            if response.status_code >= 400:
+                logger.warning(f"add_payment_to_cart failed with {response.status_code}. Checking for existing order...")
+                existing_order = await _check_for_existing_order(cart_id)
+                if existing_order:
+                    return f"NOTICE: Order already finalized for this cart. Returning order details instead.\n\n{json.dumps(existing_order, indent=2)}"
+            
             response.raise_for_status()
             return json.dumps(response.json(), indent=2)
     except Exception as e:
         logger.error(f"Error in add_payment_to_cart: {str(e)}")
+        # Final fallback check
+        existing_order = await _check_for_existing_order(cart_id)
+        if existing_order:
+             return f"NOTICE: Order already finalized for this cart. Returning order details instead.\n\n{json.dumps(existing_order, indent=2)}"
         return f"Error adding payment to cart: {str(e)}"
 
 @mcp.tool()
@@ -307,6 +338,37 @@ async def get_cart(cart_id: str) -> str:
         return f"Error fetching cart: {str(e)}"
 
 @mcp.tool()
+async def get_cart(cart_id: str) -> str:
+    """
+    Retrieve the current state of a cart.
+    """
+    logger.info(f"Tool Call: get_cart(cart_id='{cart_id}')")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            url = f"{API_BASE_URL}/carts/{cart_id}"
+            logger.info(f"Backend Request: GET {url}")
+            
+            response = await client.get(url)
+            
+            if response.status_code == 404:
+                # If cart not found, check if it was already ordered
+                logger.info(f"Cart {cart_id} not found. Checking if it was already ordered...")
+                existing_order = await _check_for_existing_order(cart_id)
+                if existing_order:
+                    return f"NOTICE: This cart ({cart_id}) has been successfully converted to an Order.\n\n{json.dumps(existing_order, indent=2)}"
+            
+            response.raise_for_status()
+            result_str = json.dumps(response.json(), indent=2)
+        return result_str
+    except Exception as e:
+        logger.error(f"Error in get_cart: {str(e)}")
+        # Check for order as a last resort fallback
+        existing_order = await _check_for_existing_order(cart_id)
+        if existing_order:
+             return f"NOTICE: This cart ({cart_id}) has already been converted to an Order.\n\n{json.dumps(existing_order, indent=2)}"
+        return f"Error fetching cart: {str(e)}"
+
+@mcp.tool()
 async def place_order(cart_id: str, version: int) -> str:
     """
     Finalize the checkout and place a formal order.
@@ -327,6 +389,12 @@ async def place_order(cart_id: str, version: int) -> str:
                 if not payment_info or not payment_info.get("payments"):
                     logger.warning(f"Order blocking: No payment attached to cart {cart_id}")
                     return "ERROR: No payment method is attached to this cart. Please use 'create_stripe_checkout' to initiate payment before placing the order."
+            elif cart_response.status_code == 404:
+                # Cart already ordered?
+                existing_order = await _check_for_existing_order(cart_id)
+                if existing_order:
+                    logger.info(f"Existing order found for cart {cart_id} during pre-check.")
+                    return json.dumps(existing_order, indent=2)
             
             params = {"cartId": cart_id, "cartVersion": version}
             url = f"{API_BASE_URL}/orders/from-cart"
@@ -340,33 +408,21 @@ async def place_order(cart_id: str, version: int) -> str:
                 logger.info(f"ORDER PLACED SUCCESSFULLY: {result.get('id')}")
                 return json.dumps(result, indent=2)
             
-            # If placement fails (e.g. cart already ordered), try to find the order
-            logger.warning(f"Order placement failed with {response.status_code}. Checking if order already exists...")
-            search_url = f"{API_BASE_URL}/orders/cart/{cart_id}"
-            search_res = await client.get(search_url)
-            
-            if search_res.status_code == 200:
-                search_data = search_res.json()
-                if search_data.get("results") and len(search_data["results"]) > 0:
-                    order = search_data["results"][0]
-                    logger.info(f"Existing order found: {order.get('id')}. Returning existing order.")
-                    return json.dumps(order, indent=2)
+            # If placement fails (e.g. cart already ordered or 409 conflict), try to find the order
+            logger.warning(f"Order placement failed with {response.status_code}. Checking for existing order...")
+            existing_order = await _check_for_existing_order(cart_id)
+            if existing_order:
+                logger.info(f"Existing order found: {existing_order.get('id')}. Returning existing order.")
+                return json.dumps(existing_order, indent=2)
             
             response.raise_for_status()
             return f"Error placing order: {response.text}"
     except Exception as e:
         logger.error(f"Error in place_order: {str(e)}")
-        # Fallback search if we hit an exception
-        try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                search_url = f"{API_BASE_URL}/orders/cart/{cart_id}"
-                search_res = await client.get(search_url)
-                if search_res.status_code == 200:
-                    search_data = search_res.json()
-                    if search_data.get("results") and len(search_data["results"]) > 0:
-                        return json.dumps(search_data["results"][0], indent=2)
-        except:
-            pass
+        # Check for order as a last resort fallback
+        existing_order = await _check_for_existing_order(cart_id)
+        if existing_order:
+             return json.dumps(existing_order, indent=2)
         return f"Error finalizing order: {str(e)}"
 
 @mcp.tool()
@@ -417,4 +473,6 @@ async def update_customer_profile(customer_id: str, first_name: str = "", last_n
         return f"Error updating customer profile for {customer_id}: {str(e)}"
 
 if __name__ == "__main__":
+    # When run directly (e.g. by Claude Desktop via stdio), mcp.run() handles everything.
+    # In Docker, run_sse.py imports mcp and runs it via uvicorn.
     mcp.run()
