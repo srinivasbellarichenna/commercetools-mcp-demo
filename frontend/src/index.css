@@ -1,0 +1,134 @@
+:root {
+  /* KESTREL Artisan Heritage Palette */
+  --bg-primary: #f5f2ed;     /* Sandstone - light cream/parchment */
+  --bg-secondary: #2c3e2d;   /* Deep Moss Green - darker heritage green */
+  --bg-surface: #ffffff;
+  
+  --accent-primary: #556b2f;   /* Dark Olive Green - secondary brand color */
+  --accent-secondary: #8b7d6b; /* Muted Taupe - artisanal trim */
+  --accent-brand: #d4af37;     /* Heritage Gold - subtle highlights */
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-light: #f5f2ed;
+  
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Montserrat', sans-serif;
+  
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --border-radius: 12px;
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  background-image: 
+    radial-gradient(circle at 2px 2px, rgba(44, 62, 45, 0.03) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+h1, h2, h3, h4, .brand-font {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background-color: var(--bg-secondary);
+  color: var(--bg-primary);
+  padding: 1rem 2.5rem;
+  border-radius: 40px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  box-shadow: 0 10px 20px rgba(44, 62, 45, 0.15);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px rgba(44, 62, 45, 0.25);
+  background-color: #384e3a;
+}
+
+.btn-outline {
+  border: 1.5px solid var(--bg-secondary);
+  color: var(--bg-secondary);
+  padding: 1rem 2.5rem;
+  border-radius: 40px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.btn-outline:hover {
+  background-color: var(--bg-secondary);
+  color: var(--bg-primary);
+}
+
+/* Navigation overrides */
+nav {
+  background: rgba(245, 242, 237, 0.85) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(44, 62, 45, 0.05);
+}
+
+.nav-link {
+  font-weight: 500;
+  color: var(--bg-secondary);
+  opacity: 0.8;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.nav-link:hover {
+  opacity: 1;
+  color: var(--accent-primary);
+}
+
+/* Custom inputs for KESTREL forms */
+input, select {
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(44, 62, 45, 0.1);
+  background: var(--bg-surface);
+  font-family: var(--font-body);
+  transition: var(--transition);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--bg-secondary);
+  box-shadow: 0 0 0 4px rgba(44, 62, 45, 0.05);
+}

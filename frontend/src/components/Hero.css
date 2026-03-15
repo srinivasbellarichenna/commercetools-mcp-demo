@@ -1,0 +1,93 @@
+.hero {
+  min-height: 90vh;
+  display: flex;
+  alignItems: center;
+  padding-top: 100px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.hero-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 4rem;
+  z-index: 2;
+}
+
+.hero-badge {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--accent-secondary);
+  margin-bottom: 2rem;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(44, 62, 45, 0.1);
+  border-radius: 40px;
+}
+
+.hero-title {
+  font-size: 5rem;
+  line-height: 1.05;
+  color: var(--bg-secondary);
+  margin-bottom: 2.5rem;
+}
+
+.hero-title .italic {
+  font-style: italic;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 550px;
+  margin-bottom: 3.5rem;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.hero-visual {
+  position: relative;
+  height: 600px;
+}
+
+.hero-blob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: var(--bg-secondary);
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  filter: blur(80px);
+  opacity: 0.1;
+  animation: morph 20s infinite alternate;
+}
+
+.hero-texture {
+  width: 100%;
+  height: 100%;
+  background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+  opacity: 0.05;
+  border-radius: 20px;
+  border: 1px solid rgba(44, 62, 45, 0.05);
+}
+
+@keyframes morph {
+  0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  100% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 60%; }
+}
+
+@media (max-width: 1024px) {
+  .hero-container { grid-template-columns: 1fr; }
+  .hero-visual { display: none; }
+  .hero-title { font-size: 3.5rem; }
+}

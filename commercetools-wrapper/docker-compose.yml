@@ -1,0 +1,107 @@
+x-common-env: &common-env
+  SPRING_PROFILES_ACTIVE: docker
+  CTP_PROJECT_KEY: ${PROJECT_KEY}
+  CTP_CLIENT_ID: ${CLIENT_ID}
+  CTP_CLIENT_SECRET: ${CLIENT_SECRET}
+  CTP_AUTH_URL: ${AUTH_URL}
+  CTP_API_URL: ${API_URL}
+  STRIPE_SECRET_KEY: sk_test_51T3OLzRAX7PsnzgqbkxrLmzGL6aJfauW2wpDbdOYQMRANalbixoimqk1u5nllMFQL7gtDDE6tvXgNoVfR7opoyOe00nBQmcS7K
+
+services:
+  product-service:
+    build: product-service
+    ports:
+      - "8081:8081"
+    networks:
+      - commercetools-net
+    environment:
+      <<: *common-env
+
+  cart-service:
+    build: cart-service
+    ports:
+      - "8082:8082"
+    networks:
+      - commercetools-net
+    environment:
+      <<: *common-env
+
+  customer-service:
+    build: customer-service
+    ports:
+      - "8083:8083"
+    networks:
+      - commercetools-net
+    environment:
+      <<: *common-env
+
+  payment-service:
+    build: payment-service
+    ports:
+      - "8084:8084"
+    networks:
+      - commercetools-net
+    environment:
+      <<: *common-env
+
+  order-service:
+    build: order-service
+    ports:
+      - "8086:8086"
+    networks:
+      - commercetools-net
+    environment:
+      <<: *common-env
+
+  api-gateway:
+    build: api-gateway
+    ports:
+      - "8085:8080"
+    networks:
+      - commercetools-net
+    environment:
+      <<: *common-env
+    depends_on:
+      - product-service
+      - cart-service
+      - customer-service
+      - payment-service
+      - order-service
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "3001:80"
+    networks:
+      - commercetools-net
+    depends_on:
+      - api-gateway
+
+  mcp-server:
+    build: ../agency/mcp-server
+    ports:
+      - "8087:8087"
+    networks:
+      - commercetools-net
+    environment:
+      - API_BASE_URL=http://api-gateway:8080/api
+    depends_on:
+      - api-gateway
+
+  mcp-client:
+    build: ../agency/mcp-client
+    networks:
+      - commercetools-net
+    environment:
+      - LM_STUDIO_URL=http://host.docker.internal:1234/v1
+      - MCP_SERVER_SSE_URL=http://mcp-server:8087/sse
+      - MODEL_NAME=meta-llama-3-8b-instruct
+      - DEFINITIVE_SUCCESS=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - mcp-server
+
+networks:
+  commercetools-net:
+    driver: bridge

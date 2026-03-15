@@ -1,0 +1,6 @@
+com/example/customer/controller/CustomerController.class
+com/example/customer/CustomerApplication.class
+com/example/customer/service/CustomerService.class
+com/example/customer/config/CommercetoolsConfig.class
+com/example/customer/config/OpenApiConfig.class
+com/example/customer/service/CustomerServiceImpl.class

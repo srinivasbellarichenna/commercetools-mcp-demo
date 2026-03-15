@@ -1,0 +1,19 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: order-service
+
+commercetools:
+  projectKey: ${CTP_PROJECT_KEY}
+  clientId: ${CTP_CLIENT_ID}
+  clientSecret: ${CTP_CLIENT_SECRET}
+  authUrl: ${CTP_AUTH_URL:https://auth.europe-west1.gcp.commercetools.com}
+  apiUrl: ${CTP_API_URL:https://api.europe-west1.gcp.commercetools.com}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
