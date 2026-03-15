@@ -1,9 +1,9 @@
 # KESTREL MCP Integration Guide
 
-This document provides the definitive instructions for integrating the KESTREL Model Context Protocol (MCP) server into your AI orchestration environment.
+This document provides instructions for integrating the KESTREL Model Context Protocol (MCP) server into your AI orchestration environment.
 
 ## 1. Architectural Overview
-The KESTREL MCP Server provides a prestigious bridge between AI intelligence and the artisanal microservice atelier. It utilizes the **SSE (Server-Sent Events)** transport to maintain a stable, long-lived connection within the Docker orchestra.
+The KESTREL MCP Server provides a bridge between AI agents and the Commercetools microservice ecosystem. It utilizes the **SSE (Server-Sent Events)** transport to maintain a stable connection within the Docker environment.
 
 - **Status**: Operational
 - **Transport**: SSE
@@ -12,7 +12,7 @@ The KESTREL MCP Server provides a prestigious bridge between AI intelligence and
 
 ## 2. Integration with LM Studio
 
-LM Studio (version 0.3.17+) acts as a sophisticated MCP Host. To establish the connection:
+LM Studio (version 0.3.17+) acts as an MCP Host. To establish the connection:
 
 1.  **Open Configuration**: In LM Studio, navigate to the **Program** tab (right sidebar) -> **Install** -> **Edit mcp.json**.
 2.  **Add Connectivity**: Append the following entry to the `mcpServers` object:
@@ -25,11 +25,11 @@ LM Studio (version 0.3.17+) acts as a sophisticated MCP Host. To establish the c
 4.  **Activate Tools**: Ensure the `kestrel-mcp` toggle is enabled in the right-hand menu.
 
 > [!TIP]
-> **Llama 3.1 Optimization**: For the most prestigious performance with Llama 3.1 Instruct, ensure your system prompt explicitly forbids ID hallucination and enforces data discovery via `get_collection`.
+> **Llama 3.1 Optimization**: For the best performance with Llama 3.1 Instruct, ensure your system prompt explicitly forbids ID hallucination and enforces data discovery via `get_collection`.
 
 ## 3. Integration with Claude Desktop
 
-To empower your Claude Desktop experience with artisanal agency:
+To empower your Claude Desktop experience with AI agency:
 
 1.  **Locate Config**: Open `~/Library/Application Support/Claude/claude_desktop_config.json`.
 2.  **Register Server**: Add the KESTREL bridge to the `mcpServers` section:
@@ -41,20 +41,20 @@ To empower your Claude Desktop experience with artisanal agency:
     }
     ```
 
-## 4. Available Artisanal Tools
+## 4. Available E-commerce Tools
 
-Once connected, your model gains access to the following registry and collection tools:
+Once connected, your AI agent gains access to the following product and customer management tools:
 
-- `get_collection`: List the heritage pieces currently in the collection.
-- `get_piece_detail`: View the deep specifications and heritage of a specific piece.
-- `initialize_bag`: Create a new acquisition bag (cart) for a specific territory.
-- `commit_to_bag`: Add an artisanal choice to the acquisition bag.
-- `get_patron_registry`: Retrieve records and history for a specific patron.
-- `refine_registry_record`: Update a patron's formal details in the registry.
+- `get_collection`: List the products currently in the catalog.
+- `get_piece_detail`: View the detailed specifications of a specific product.
+- `initialize_bag`: Create a new shopping cart for a specific territory.
+- `commit_to_bag`: Add a product to the shopping cart.
+- `get_patron_registry`: Retrieve records and history for a specific customer.
+- `refine_registry_record`: Update a customer's details in the system.
 
 ## 5. Deployment Management
 
-The server is managed via the KESTREL Docker orchestra. To restart or rebuild the bridge:
+The server is managed via Docker. To restart or rebuild the bridge:
 
 ```bash
 cd commercetools-wrapper
