@@ -19,6 +19,7 @@ The orchestral bridges for AI integration:
 
 ### 3. [Curatorial Guidelines](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs)
 Essential blueprints for setup and integration:
+- [🏺 Local Onboarding Manuscript](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/LOCAL_SETUP_GUIDE.md) — **Start Here**
 - [KESTREL MCP Integration](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/KESTREL_MCP_INTEGRATION.md)
 - [Official Commercetools MCP Setup](file:///Users/srinivasbellarichenna/Personal/dev/ai-projects/antigravity_workspace/commercetools-mcp-demo/docs/COMMERCETOOLS_MCP_SETUP.md)
 

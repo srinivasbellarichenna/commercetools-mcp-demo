@@ -21,11 +21,11 @@ LM Studio (version 0.3.17+) acts as a sophisticated MCP Host. To establish the c
       "url": "http://localhost:8087/sse"
     }
     ```
-3.  **Deploy Model**: Load a model with tool-calling capabilities (e.g., **Llama 3.1** or **Gemma 2**).
+3.  **Deploy Model**: Load a model with tool-calling capabilities (e.g., **Llama 3.1**).
 4.  **Activate Tools**: Ensure the `kestrel-mcp` toggle is enabled in the right-hand menu.
 
 > [!TIP]
-> **Qwen 2.5 Coder Optimization**: For the most prestigious performance with Qwen 2.5 Coder (Instruct versions), select the **ChatML** preset in the LM Studio "Settings" tab. This ensures the model correctly formats its tool-calling JSON for the KESTREL bridge.
+> **Llama 3.1 Optimization**: For the most prestigious performance with Llama 3.1 Instruct, ensure your system prompt explicitly forbids ID hallucination and enforces data discovery via `get_collection`.
 
 ## 3. Integration with Claude Desktop
 
