@@ -128,4 +128,18 @@ public class CartServiceImpl implements CartService {
                 .executeBlocking()
                 .getBody();
     }
+
+    @Override
+    public Cart addPayment(String cartId, String paymentId) {
+        Cart cart = getCartById(cartId);
+        return apiRoot.carts()
+                .withId(cartId)
+                .post(CartUpdateBuilder.of()
+                        .version(cart.getVersion())
+                        .plusActions(actionBuilder -> actionBuilder.addPaymentBuilder()
+                                .payment(paymentBuilder -> paymentBuilder.id(paymentId)))
+                        .build())
+                .executeBlocking()
+                .getBody();
+    }
 }

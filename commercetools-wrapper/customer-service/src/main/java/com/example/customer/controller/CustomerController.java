@@ -6,6 +6,10 @@ import com.example.customer.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +40,62 @@ public class CustomerController {
 
     @Operation(summary = "Get Customer Profile")
     @GetMapping("/{customerId}")
-    public ResponseEntity<Customer> getCustomerById(
+    public ResponseEntity<Object> getCustomerById(
             @Parameter(description = "The unique identifier of the customer") @PathVariable String customerId) {
-        return ResponseEntity.ok(customerService.getCustomerById(customerId));
+        Customer customer = customerService.getCustomerById(customerId);
+        return ResponseEntity.ok(convertToMap(customer));
+    }
+
+    @Operation(summary = "Search Customer by Email")
+    @GetMapping("/search")
+    public ResponseEntity<Object> getCustomerByEmail(
+            @Parameter(description = "The email address of the customer") @RequestParam String email) {
+        Customer customer = customerService.getCustomerByEmail(email);
+        return ResponseEntity.ok(convertToMap(customer));
+    }
+
+    private Map<String, Object> convertToMap(Customer customer) {
+        if (customer == null) return null;
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", customer.getId());
+        map.put("email", customer.getEmail());
+        map.put("firstName", customer.getFirstName());
+        map.put("lastName", customer.getLastName());
+        map.put("version", customer.getVersion());
+        map.put("defaultShippingAddressId", customer.getDefaultShippingAddressId());
+        map.put("defaultBillingAddressId", customer.getDefaultBillingAddressId());
+        
+        if (customer.getAddresses() != null) {
+            List<Map<String, Object>> addressMaps = customer.getAddresses().stream()
+                    .map(this::addressToMap)
+                    .collect(Collectors.toList());
+            map.put("addresses", addressMaps);
+        }
+        
+        return map;
+    }
+
+    private Map<String, Object> addressToMap(com.commercetools.api.models.common.Address address) {
+        if (address == null) return null;
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", address.getId());
+        map.put("firstName", address.getFirstName());
+        map.put("lastName", address.getLastName());
+        map.put("streetName", address.getStreetName());
+        map.put("streetNumber", address.getStreetNumber());
+        map.put("postalCode", address.getPostalCode());
+        map.put("city", address.getCity());
+        map.put("region", address.getRegion());
+        map.put("state", address.getState());
+        map.put("country", address.getCountry());
+        map.put("company", address.getCompany());
+        map.put("department", address.getDepartment());
+        map.put("building", address.getBuilding());
+        map.put("apartment", address.getApartment());
+        map.put("phone", address.getPhone());
+        map.put("mobile", address.getMobile());
+        map.put("email", address.getEmail());
+        return map;
     }
 
     @Operation(summary = "Add Address to Customer Profile")
@@ -84,5 +141,11 @@ public class CustomerController {
             @RequestParam String last4,
             @RequestParam String brand) {
         return ResponseEntity.ok(customerService.addPaymentMethod(customerId, paymentToken, last4, brand));
+    }
+
+    @Operation(summary = "Get all Customers")
+    @GetMapping
+    public ResponseEntity<com.commercetools.api.models.customer.CustomerPagedQueryResponse> getCustomers() {
+        return ResponseEntity.ok(customerService.getCustomers());
     }
 }

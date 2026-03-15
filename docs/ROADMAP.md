@@ -1,65 +1,64 @@
-# 🗺️ KESTREL: Future Roadmap
+# 🗺️ Composable Agentic Commerce: Strategic Roadmap
 
-This document outlines the strategic improvements and technical evolutions designed to elevate **KESTREL** into a world-class agentic commerce demo.
-
----
-
-## 🚀 Phase 1: Advanced AI Orchestration
-
-### 1. Multi-Agent System
-Transition from a single agent to a **Federated AI Workforce**:
-- **Discovery Agent**: Specializes in product research and selection.
-- **Cart Manager**: Manages session state, inventory locks, and cart optimization.
-- **Checkout Agent**: Handles the secure protocols of checkout and payment.
-
-### 2. Conversational Memory
-Implement a vector-based memory system (e.g., using **Chroma** or **Pinecone**):
-- Enable the AI agent to remember a customer's previous preferences and purchase history.
-- Personalize product discovery based on past interactions.
-
-### 3. Voice Interaction
-Integrate **OpenAI Whisper/TTS** or **ElevenLabs** into the `mcp-client`:
-- Allow the AI agent to speak its reasoning, providing an interactive and modern experience.
+This document outlines the technical evolution from a "Headless Demo" to a fully decentralized, **Composable Agentic Commerce** platform.
 
 ---
 
-## 🏛️ Phase 2: Architectural Resilience & Observability
+## 🚀 Phase 1: Decoupling & Composability (The "Composable" Pillar)
 
-### 1. System Observability
-Integrate an observability stack into the Docker environment:
-- **Prometheus & Grafana**: Real-time metrics on microservice health.
-- **Jaeger/Tempo**: Distributed tracing to visualize the life of a "Add to Cart" request across the system.
+### 1. Unified Event Mesh
+Transition from synchronous REST calls to a reactive, event-driven architecture:
+- **Broker Integration**: Introduce **Redis Pub/Sub** or **RabbitMQ** to allow microservices to emit "Cart Updated," "Product Viewed," or "Order Placed" events.
+- **Agentic Listeners**: Enable AI agents to "subscribe" to events, allowing them to act proactively (e.g., suggesting a discount when a customer hesitates at checkout).
 
-### 2. System Resilience
-Implement advanced resilience patterns:
-- **Circuit Breakers**: Prevent cascading failures in the API Gateway.
-- **Graceful Retries**: Policy-based retries for the MCP server when connecting to unstable cloud backends.
-
-### 3. High-Performance Search
-Integrate **Algolia** or **Typesense** for the product catalog:
-- Provide the AI agent with sub-millisecond search capabilities for massive product collections.
+### 2. Provider Abstraction (Adapters)
+Decouple the backend from Commercetools-specific logic:
+- **Generic Service Interfaces**: Define standard schemas for "Product," "Cart," and "Customer."
+- **Multi-Provider Support**: Implement adapters for **Shopify**, **BigCommerce**, or **Custom Databases**, making the platform truly composable.
 
 ---
 
-## 🎨 Phase 3: Visual & Interactive Experience
+## 🤖 Phase 2: Multi-Agent Intelligence (The "Agentic" Pillar)
 
-### 1. 3D Product Visualization
-Implement **Three.js** or **React Three Fiber** on the Product Detail Page:
-- Allow customers to rotate and inspect products in 3D space.
+### 1. Federated Agentic Workforce
+Move beyond a single orchestrator to a specialized workforce:
+- **The Strategist**: Manages high-level goals and delegates to sub-agents.
+- **The Analyst**: Scans catalogs and market trends for discovery.
+- **The Closer**: Specializes in secure transaction execution and compliance.
 
-### 2. Customer Purchase Timeline
-A refined "Order History" reimagined as an interactive timeline:
-- Visualize the customer's journey and purchase history within the KESTREL demo.
+### 2. Persistent Agentic Memory (RAG)
+Implement a dedicated **Vector Database (Chroma/Milvus)**:
+- Store customer interaction history, preferences, and unstructured feedback.
+- Allow agents to perform **Retrieval-Augmented Generation (RAG)** to provide highly personalized, data-backed recommendations.
+
+---
+
+## 🏛️ Phase 3: Resilience & Deep Observability
+
+### 1. OpenTelemetry Integration
+Full-stack observability for both code and "thought":
+- **Distributed Tracing**: Visualize agentic tool calls alongside microservice requests.
+- **Agentic Logs**: Store LLM reasoning chains to debug "why" an agent made a specific commerce decision.
+
+### 2. Circuit Breakers & Self-Healing
+Implement the **Resilience4j** pattern:
+- Gracefully downgrade agent capabilities if a third-party commerce API is unstable.
+- Enable agents to "self-heal" by retrying with alternative tools or providers.
 
 ---
 
-## 🔒 Phase 4: Production-Grade Security
+## 🎨 Phase 4: Dynamic & Generative Experience
 
-### 1. OAuth2 Authentication
-Move from basic environment variables to a formal **OAuth2/OIDC** flow within the `mcp-server`, ensuring secure authentication for customers.
+### 1. Server-Driven / Agent-Driven UI
+The frontend adapts to the agent's strategy:
+- **Dynamic Slots**: Allow the execution agent to inject specific UI components (e.g., a personalized comparison widget) based on real-time conversation.
 
-### 2. Stripe Production Readiness
-Complete the Stripe integration with **Webhooks** and **Payment Intent** status polling, ensuring secure and reliable payment processing.
+### 2. Strategic OAuth2 Flow
+Formalize security with a dedicated **Identity Provider**:
+- Secure agent-acting-on-behalf-of-user tokens, moving away from shared environment variables.
 
 ---
-*KESTREL - Designing the Next Generation of E-commerce*
+*Composable Agentic Commerce - Building the Future of Autonomous Retail*
+
+---
+*Composable Agentic Commerce - Designing the Next Generation of E-commerce*

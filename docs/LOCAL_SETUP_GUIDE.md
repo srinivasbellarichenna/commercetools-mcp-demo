@@ -1,6 +1,6 @@
-# 🏺 KESTREL: Local Setup Guide
+# 🏺 Composable Agentic Commerce: Local Setup Guide
 
-This guide provides the steps for setting up the **KESTREL** demo locally on your system. Follow these instructions to run the microservice ecosystem and initiate autonomous AI agents.
+This guide provides the steps for setting up the **Composable Agentic Commerce** demo locally on your system. Follow these instructions to run the microservice ecosystem and initiate autonomous AI agents.
 
 ## 🛠️ Prerequisites
 
@@ -47,16 +47,14 @@ Before beginning the setup, ensure your system is equipped with the following:
 
 ## 🤖 Step 3: Enabling the AI Agent (MCP)
 
-To connect an AI agent (like Llama 3) to the KESTREL bridge:
+To connect an AI agent (like Llama 3) to the bridge:
 
 1.  **Open LM Studio** and navigate to **Settings** -> **MCP**.
 2.  **Register the Server**:
     Add the following to your `mcp.json`:
     ```json
-    "mcpServers": {
-      "kestrel-mcp": {
-        "url": "http://localhost:8087/sse"
-      }
+    "agentic-commerce-mcp": {
+      "url": "http://localhost:8087/sse"
     }
     ```
 3.  **Start Conversation**: Load a model (e.g., Llama 3.1 8B Instruct) and ask:
@@ -86,4 +84,4 @@ Look for the success message:
 - `/config`: External configuration templates.
 
 ---
-*KESTREL - Commercetools MCP Integration Demo*
+*Composable Agentic Commerce - Commercetools MCP Integration Demo*

@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 const Checkout = () => {
-  const { cart, refreshCart, assignPatronToBag } = useContext(CartContext);
+  const { cart, refreshCart, assignUserToCart } = useContext(CartContext);
   const { user, refreshUser } = useContext(AuthContext);
   const [step, setStep] = useState(1);
   const [shippingMethods, setShippingMethods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [customerProfile, setCustomerProfile] = useState(null);
   const [saveToProfile, setSaveToProfile] = useState(false);
+  const [savePaymentMethod, setSavePaymentMethod] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -41,7 +43,7 @@ const Checkout = () => {
     if (!cart) refreshCart();
     
     if (user) {
-      fetch(`http://localhost:8085/api/customers/${user.id}`)
+      fetch(`${API_BASE_URL}/customers/${user.id}`)
         .then(res => res.json())
         .then(data => setCustomerProfile(data))
         .catch(err => console.error("Failed to fetch profile", err));
@@ -78,14 +80,14 @@ const Checkout = () => {
     if (step === 1) {
       setLoading(true);
       try {
-        await fetch(`http://localhost:8085/api/carts/${cart.id}/shipping-address`, {
+        await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-address`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData.shippingAddress),
         });
         
         if (saveToProfile && user) {
-          await fetch(`http://localhost:8085/api/customers/${user.id}/addresses`, {
+          await fetch(`${API_BASE_URL}/customers/${user.id}/addresses`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData.shippingAddress),
@@ -93,7 +95,7 @@ const Checkout = () => {
           refreshUser();
         }
 
-        const res = await fetch(`http://localhost:8085/api/carts/${cart.id}/shipping-methods`);
+        const res = await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-methods`);
         const methods = await res.json();
         setShippingMethods(methods);
         setStep(2);
@@ -106,7 +108,7 @@ const Checkout = () => {
       setLoading(true);
       try {
         const billingAddr = formData.sameAsShipping ? formData.shippingAddress : formData.billingAddress;
-        await fetch(`http://localhost:8085/api/carts/${cart.id}/billing-address`, {
+        await fetch(`${API_BASE_URL}/carts/${cart.id}/billing-address`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(billingAddr),
@@ -121,7 +123,7 @@ const Checkout = () => {
       if (!formData.shippingMethodId) return;
       setLoading(true);
       try {
-        await fetch(`http://localhost:8085/api/carts/${cart.id}/shipping-method?shippingMethodId=${formData.shippingMethodId}`, {
+        await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-method?shippingMethodId=${formData.shippingMethodId}`, {
           method: 'POST',
         });
         setStep(4);
@@ -136,23 +138,26 @@ const Checkout = () => {
   const handleStripeCheckout = async () => {
     setLoading(true);
     try {
-      // Final synchronization check: Ensure patron identity is formally linked to the bag
       if (user && cart && !cart.customerId) {
-        console.log("Definitive identity synchronization before archival...");
-        await assignPatronToBag(user.id);
+        await assignUserToCart(user.id);
       }
 
       const successUrl = `${window.location.origin}/checkout/success`;
       const cancelUrl = `${window.location.origin}/cart`;
-      const res = await fetch(`http://localhost:8085/api/payments/checkout?cartId=${cart.id}&successUrl=${encodeURIComponent(successUrl)}&cancelUrl=${encodeURIComponent(cancelUrl)}`, { 
+      const res = await fetch(`${API_BASE_URL}/payments/checkout?cartId=${cart.id}&successUrl=${encodeURIComponent(successUrl)}&cancelUrl=${encodeURIComponent(cancelUrl)}`, { 
         method: 'POST' 
       });
       const data = await res.json();
       if (data.url) {
+        if (savePaymentMethod) {
+          localStorage.setItem('savePaymentPreference', 'true');
+        } else {
+          localStorage.removeItem('savePaymentPreference');
+        }
         window.location.href = data.url;
       }
     } catch (e) {
-      console.error("Stripe checkout failed", e);
+      console.error("Payment initiation failed", e);
     } finally {
       setLoading(false);
     }
@@ -167,7 +172,7 @@ const Checkout = () => {
         {/* Progress Header */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--bg-primary)', padding: '0.75rem 1.5rem', borderRadius: '40px', fontWeight: 600, letterSpacing: '0.1em', fontSize: '0.85rem' }}>
-            KESTREL SECURE CHECKOUT
+            SECURE CHECKOUT
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5rem', position: 'relative', padding: '0 2rem' }}>
@@ -215,7 +220,7 @@ const Checkout = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', marginBottom: '2.5rem', color: 'var(--bg-secondary)', fontWeight: 500 }}>Where shall we send your pieces?</h2>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', marginBottom: '2.5rem', color: 'var(--bg-secondary)', fontWeight: 500 }}>Where shall we send your order?</h2>
               
               {customerProfile?.addresses?.length > 0 && (
                 <div style={{ marginBottom: '4rem' }}>
@@ -357,7 +362,7 @@ const Checkout = () => {
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', marginBottom: '2.5rem', color: 'var(--bg-secondary)', fontWeight: 500 }}>Final Confirmation</h2>
               <div style={{ backgroundColor: 'var(--bg-surface)', padding: '3rem', borderRadius: 'var(--border-radius)', marginBottom: '3rem', boxShadow: 'var(--shadow-soft)', border: '1px solid rgba(44, 62, 45, 0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem', color: 'var(--accent-primary)', fontWeight: 500, opacity: 0.8 }}>
-                  <span>Artisanal Subtotal</span>
+                  <span>Subtotal</span>
                   <span>{cart.totalPrice.centAmount / 100} {cart.totalPrice.currencyCode}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem', color: 'var(--accent-primary)', fontWeight: 500, opacity: 0.8 }}>
@@ -366,9 +371,26 @@ const Checkout = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '1.6rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(44, 62, 45, 0.1)', color: 'var(--bg-secondary)', marginTop: '1rem' }}>
                   <span>Total Due</span>
-                  <span>{cart.totalPrice.centAmount / 100} {cart.totalPrice.currencyCode}</span>
                 </div>
               </div>
+
+              {user && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 500, color: 'var(--bg-secondary)' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={savePaymentMethod} 
+                      onChange={() => setSavePaymentMethod(!savePaymentMethod)} 
+                      style={{ width: '18px', height: '18px', accentColor: 'var(--bg-secondary)' }} 
+                    />
+                    <span>Securely save this payment method for future orders</span>
+                  </label>
+                  <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--accent-secondary)', fontStyle: 'italic', marginLeft: '2.2rem' }}>
+                    Your card details are tokenized and stored securely. We never store sensitive data on our servers.
+                  </p>
+                </div>
+              )}
+
               <div style={{ display: 'flex', gap: '1.5rem' }}>
                 <button className="btn-outline" style={{ flex: 1, padding: '1.2rem' }} onClick={() => setStep(3)}>Back</button>
                 <button className="btn-primary" style={{ flex: 2, padding: '1.4rem' }} onClick={handleStripeCheckout} disabled={loading}>

@@ -7,4 +7,5 @@ public interface OrderService {
     Order createOrderFromCart(String cartId, Long cartVersion);
     Order getOrderById(String orderId);
     OrderPagedQueryResponse getOrdersByCustomerId(String customerId);
+    OrderPagedQueryResponse getOrderByCartId(String cartId);
 }

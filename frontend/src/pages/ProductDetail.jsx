@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingBag, ChevronLeft, ShieldCheck, Truck, RefreshCw, Loader2 } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
+import { API_BASE_URL } from '../config/api';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -15,7 +16,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:8085/api/products/${id}`);
+        const res = await fetch(`${API_BASE_URL}/products/${id}`);
         const data = await res.json();
         setProduct(data);
       } catch (e) {
@@ -74,26 +75,23 @@ const ProductDetail = () => {
             border: '1px solid rgba(44, 62, 45, 0.05)',
             backgroundColor: 'white'
           }}>
-            <img src={imageUrl} alt={title} style={{ width: '100%', height: 'auto', display: 'block', filter: 'sepia(0.1)' }} />
+            <img src={imageUrl} alt={title} style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}>
           <div style={{ marginBottom: '3rem' }}>
             <span style={{ color: 'var(--accent-secondary)', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.2rem', textTransform: 'uppercase', marginBottom: '1rem', display: 'block' }}>
-              Handcrafted Heritage
+              Composable Agentic Commerce
             </span>
             <h1 style={{ fontSize: '3.5rem', marginBottom: '1.5rem', color: 'var(--bg-secondary)', lineHeight: 1.1 }}>{title}</h1>
             <div style={{ fontSize: '1.8rem', color: 'var(--accent-primary)', fontWeight: 600, fontFamily: 'var(--font-body)' }}>
-              {price ? `${(price.centAmount / 100).toFixed(2)} ${price.currencyCode}` : 'Contact Atelier'}
+              {price ? `${(price.centAmount / 100).toFixed(2)} ${price.currencyCode}` : 'Inquiry Required'}
             </div>
           </div>
 
           <div style={{ marginBottom: '3.5rem', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.8 }}>
             <p>{description}</p>
-            <p style={{ marginTop: '1.5rem', fontStyle: 'italic', opacity: 0.8 }}>
-              Each piece is created individually in our Cotswolds workshop. Subtle variations in texture and tone are a signature of its artisanal soul.
-            </p>
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '4rem' }}>
@@ -103,7 +101,7 @@ const ProductDetail = () => {
               onClick={handleAdd}
               disabled={adding}
             >
-              {adding ? 'Securing for your Bag...' : 'Add to Bag'}
+              {adding ? 'Adding to Cart...' : 'Add to Cart'}
             </button>
             <button className="btn-outline" style={{ padding: '0 1.5rem' }}><ShoppingBag size={24} /></button>
           </div>

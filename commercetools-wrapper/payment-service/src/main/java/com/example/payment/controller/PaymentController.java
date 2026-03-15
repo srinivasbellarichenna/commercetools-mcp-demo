@@ -26,4 +26,21 @@ public class PaymentController {
         String checkoutUrl = paymentService.createCheckoutSession(cartId, successUrl, cancelUrl);
         return ResponseEntity.ok(Map.of("url", checkoutUrl));
     }
+
+    @Operation(summary = "Get Stripe Session Details")
+    @GetMapping("/session/{sessionId}")
+    public ResponseEntity<com.stripe.model.checkout.Session> getSessionDetails(
+            @PathVariable String sessionId) {
+        return ResponseEntity.ok(paymentService.getSessionDetails(sessionId));
+    }
+
+    @Operation(summary = "Create Commercetools Payment")
+    @PostMapping
+    public ResponseEntity<com.commercetools.api.models.payment.Payment> createPayment(
+            @RequestParam String cartId,
+            @RequestParam String amount,
+            @RequestParam String currency,
+            @RequestParam String paymentMethod) {
+        return ResponseEntity.ok(paymentService.createPayment(cartId, amount, currency, paymentMethod));
+    }
 }

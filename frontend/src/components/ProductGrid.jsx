@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 import ProductCard from './ProductCard';
 
 const ProductGrid = () => {
@@ -18,7 +19,7 @@ const ProductGrid = () => {
       if (!isAppend) setLoading(true);
       else setLoadingMore(true);
 
-      const url = `http://localhost:8085/api/products?limit=${limit}&offset=${newOffset}&sort=${sort}${search ? `&text=${search}` : ''}`;
+      const url = `${API_BASE_URL}/products?limit=${limit}&offset=${newOffset}&sort=${sort}${search ? `&text=${search}` : ''}`;
       const res = await fetch(url);
       const data = await res.json();
       
@@ -57,7 +58,7 @@ const ProductGrid = () => {
           <div>
             <h2 style={{ fontSize: '3rem', color: 'var(--bg-secondary)', marginBottom: '1rem' }}>The Collection</h2>
             <p style={{ color: 'var(--accent-secondary)', fontSize: '1rem', fontWeight: 500 }}>
-              Discover {total} artisanal pieces, unique in every detail.
+              Discover {total} products curated for the modern enterprise.
             </p>
           </div>
           
@@ -66,7 +67,7 @@ const ProductGrid = () => {
               <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
               <input 
                 type="text" 
-                placeholder="Search legacy pieces..." 
+                placeholder="Search collection..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{ paddingLeft: '3rem', border: '1px solid rgba(44, 62, 45, 0.1)', background: 'var(--bg-surface)', color: 'var(--bg-secondary)' }}
@@ -121,10 +122,10 @@ const ProductGrid = () => {
               {loadingMore ? (
                 <>
                   <Loader2 className="animate-spin" size={18} />
-                  Preparing more pieces...
+                  Loading items...
                 </>
               ) : (
-                'Discover Further Items'
+                'View More'
               )}
             </button>
           </div>

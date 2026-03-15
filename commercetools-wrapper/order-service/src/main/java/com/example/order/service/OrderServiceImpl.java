@@ -37,4 +37,13 @@ public class OrderServiceImpl implements OrderService {
                 .executeBlocking()
                 .getBody();
     }
+
+    @Override
+    public OrderPagedQueryResponse getOrderByCartId(String cartId) {
+        return apiRoot.orders()
+                .get()
+                .withWhere("cart(id = :cartId)", "cartId", cartId)
+                .executeBlocking()
+                .getBody();
+    }
 }

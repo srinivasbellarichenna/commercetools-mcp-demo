@@ -1,6 +1,6 @@
-# KESTREL - Commercetools MCP Demo
+# Composable Agentic Commerce - Commercetools MCP Demo
 
-Welcome to **KESTREL**, a demonstration of Commercetools microservices integrated with autonomous AI agents via the Model Context Protocol (MCP).
+Welcome to **Composable Agentic Commerce**, a demonstration of Commercetools microservices integrated with autonomous AI agents via the Model Context Protocol (MCP).
 
 ## 🏛️ Project Architecture
 
@@ -24,7 +24,7 @@ The orchestration bridges for AI integration:
 Essential blueprints for setup and integration:
 - [🏺 Local Setup Guide](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/LOCAL_SETUP_GUIDE.md) — **Start Here**
 - [🗺️ Project Roadmap](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/ROADMAP.md) — **Future Vision**
-- [KESTREL MCP Integration](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/KESTREL_MCP_INTEGRATION.md)
+- [Agentic Commerce Integration](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/AGENTIC_COMMERCE_INTEGRATION.md)
 - [Official Commercetools MCP Setup](file:///Users/srinivasbellarichenna/Personal/dev/ai-projects/antigravity_workspace/commercetools-mcp-demo/docs/COMMERCETOOLS_MCP_SETUP.md)
 
 ### 4. [Development Skills](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/skills)
@@ -44,4 +44,4 @@ docker logs -f commercetools-wrapper-mcp-client-1
 ```
 
 ---
-*KESTREL - Commercetools MCP Integration Demo*
+*Composable Agentic Commerce - Established 2026*

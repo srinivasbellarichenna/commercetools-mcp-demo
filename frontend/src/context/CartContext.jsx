@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 export const CartContext = createContext();
 
@@ -11,12 +12,12 @@ export const CartProvider = ({ children }) => {
     try {
       const existingCartId = localStorage.getItem('cartId');
       if (existingCartId && existingCartId !== 'undefined') {
-        const res = await fetch(`http://localhost:8085/api/carts/${existingCartId}`);
+        const res = await fetch(`${API_BASE_URL}/carts/${existingCartId}`);
         if (res.ok) {
           const data = await res.json();
-          // Migration: If the existing cart isn't EUR or isn't in the DE territory, we must clear it to match KESTREL pricing
+          // Migration: If the existing cart isn't EUR or isn't in the DE territory, we must clear it
           if (data.totalPrice?.currencyCode !== 'EUR' || data.country !== 'DE') {
-            console.log("Legacy or non-territorial cart detected, migrating to EUR/DE...");
+            console.log("Legacy cart detected, migrating...");
             localStorage.removeItem('cartId');
             await createNewCart();
             return;
@@ -36,47 +37,45 @@ export const CartProvider = ({ children }) => {
 
   const createNewCart = async () => {
     try {
-      const res = await fetch('http://localhost:8085/api/carts?currencyCode=EUR&country=DE', { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/carts?currencyCode=EUR&country=DE`, { method: 'POST' });
       const data = await res.json();
       setCart(data);
       localStorage.setItem('cartId', data.id);
       
-      // If a user is already authenticated, formally link their identity immediately
       if (user) {
-        await assignPatronToBag(user.id, data.id);
+        await assignUserToCart(user.id, data.id);
       }
     } catch (e) {
       console.error("Cart creation failed", e);
     }
   };
 
-  const assignPatronToBag = async (customerId, specificCartId = null) => {
+  const assignUserToCart = async (customerId, specificCartId = null) => {
     const targetCartId = specificCartId || (cart ? cart.id : localStorage.getItem('cartId'));
     if (!targetCartId || !customerId || targetCartId === 'undefined') return;
     
-    // Safety check: if we have the current cart, and it's already assigned, skip
     if (cart && cart.id === targetCartId && cart.customerId === customerId) {
       return;
     }
 
     try {
-      const res = await fetch(`http://localhost:8085/api/carts/${targetCartId}/customer?customerId=${customerId}`, {
+      const res = await fetch(`${API_BASE_URL}/carts/${targetCartId}/customer?customerId=${customerId}`, {
         method: 'POST'
       });
       if (res.ok) {
         const updatedCart = await res.json();
         setCart(updatedCart);
-        console.log("Patron identity synchronized with Bag");
+        console.log("Customer identity synchronized with Cart");
         return updatedCart;
       }
     } catch (e) {
-      console.error("Failed to synchronize patron identity", e);
+      console.error("Failed to synchronize customer identity", e);
     }
   };
 
   useEffect(() => {
     if (user && cart && !cart.customerId) {
-      assignPatronToBag(user.id);
+      assignUserToCart(user.id);
     }
   }, [user, cart]);
 
@@ -87,7 +86,7 @@ export const CartProvider = ({ children }) => {
       params.append('sku', sku);
       params.append('quantity', quantity);
 
-      const res = await fetch(`http://localhost:8085/api/carts/${cart.id}/items?${params.toString()}`, {
+      const res = await fetch(`${API_BASE_URL}/carts/${cart.id}/items?${params.toString()}`, {
         method: 'POST'
       });
       if (!res.ok) throw new Error(`Add to cart failed: ${res.status}`);
@@ -101,7 +100,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (lineItemId) => {
     if (!cart) return;
     try {
-      const res = await fetch(`http://localhost:8085/api/carts/${cart.id}/items/${lineItemId}`, {
+      const res = await fetch(`${API_BASE_URL}/carts/${cart.id}/items/${lineItemId}`, {
         method: 'DELETE'
       });
       const updatedCart = await res.json();
@@ -116,7 +115,7 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   return (
-    <CartContext.Provider value={{ cart, refreshCart, addToCart, removeFromCart, assignPatronToBag }}>
+    <CartContext.Provider value={{ cart, refreshCart, addToCart, removeFromCart, assignUserToCart }}>
       {children}
     </CartContext.Provider>
   );

@@ -33,7 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(successUrl + "?cartId=" + cartId + "&cartVersion=" + cart.getVersion())
+                .setSuccessUrl(successUrl + "?cartId=" + cartId + "&cartVersion=" + cart.getVersion() + "&sessionId={CHECKOUT_SESSION_ID}")
                 .setCancelUrl(cancelUrl)
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
@@ -41,7 +41,7 @@ public class PaymentServiceImpl implements PaymentService {
                                 .setCurrency(currency)
                                 .setUnitAmount(amount)
                                 .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                        .setName("KESTREL Artisanal Acquisition")
+                                        .setName("Agentic Commerce Acquisition")
                                         .build())
                                 .build())
                         .build())
@@ -53,5 +53,32 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (Exception e) {
             throw new RuntimeException("Error creating Stripe session", e);
         }
+    }
+    
+    @Override
+    public Session getSessionDetails(String sessionId) {
+        try {
+            return Session.retrieve(sessionId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving Stripe session", e);
+        }
+    }
+
+    @Override
+    public com.commercetools.api.models.payment.Payment createPayment(String cartId, String amount, String currency, String paymentMethod) {
+        return apiRoot.payments()
+                .post(com.commercetools.api.models.payment.PaymentDraftBuilder.of()
+                        .amountPlanned(com.commercetools.api.models.common.CentPrecisionMoneyDraftBuilder.of()
+                                .centAmount(Long.parseLong(amount))
+                                .currencyCode(currency)
+                                .fractionDigits(2)
+                                .build())
+                        .paymentMethodInfo(com.commercetools.api.models.payment.PaymentMethodInfoBuilder.of()
+                                .method(paymentMethod)
+                                .paymentInterface("Stripe")
+                                .build())
+                        .build())
+                .executeBlocking()
+                .getBody();
     }
 }

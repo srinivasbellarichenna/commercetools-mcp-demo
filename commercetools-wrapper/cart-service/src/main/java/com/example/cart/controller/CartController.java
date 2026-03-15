@@ -84,4 +84,12 @@ public class CartController {
             @PathVariable String lineItemId) {
         return ResponseEntity.ok(cartService.removeLineItem(cartId, lineItemId));
     }
+
+    @Operation(summary = "Add Payment to Cart")
+    @PostMapping("/{cartId}/payments")
+    public ResponseEntity<Cart> addPayment(
+            @PathVariable String cartId,
+            @RequestParam String paymentId) {
+        return ResponseEntity.ok(cartService.addPayment(cartId, paymentId));
+    }
 }

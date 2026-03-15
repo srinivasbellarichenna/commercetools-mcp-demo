@@ -1,35 +1,48 @@
-import React, { useEffect, useContext, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useContext, useState, useRef } from 'react';
+import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, Package, ArrowRight, ShieldCheck } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams();
   const { refreshCart } = useContext(CartContext);
+  const { user, refreshUser } = useContext(AuthContext);
   const [orderId, setOrderId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const hasFinalized = useRef(false);
+  const hasSavedPayment = useRef(false);
 
   useEffect(() => {
     const finalizeOrder = async () => {
       const cartId = searchParams.get('cartId');
       const cartVersion = searchParams.get('cartVersion');
       
-      if (cartId && cartVersion) {
+      if (cartId && cartVersion && !hasFinalized.current) {
+        hasFinalized.current = true;
         setLoading(true);
+        console.log("🚀 Finalizing order for Cart:", cartId, "Version:", cartVersion);
+        
         try {
-          const res = await fetch(`http://localhost:8085/api/orders/from-cart?cartId=${cartId}&cartVersion=${cartVersion}`, {
+          const res = await fetch(`${API_BASE_URL}/orders/from-cart?cartId=${cartId}&cartVersion=${cartVersion}`, {
             method: 'POST'
           });
+          
           if (res.ok) {
             const data = await res.json();
             setOrderId(data.id);
+            console.log("✅ Order created successfully:", data.id);
+            
             // Clear the cart on success
             localStorage.removeItem('cartId');
             refreshCart();
+          } else {
+            console.error("❌ Order conversion failed:", res.status);
           }
         } catch (e) {
-          console.error("Order creation failed", e);
+          console.error("❌ Order creation exception:", e);
         } finally {
           setLoading(false);
         }
@@ -39,10 +52,45 @@ const CheckoutSuccess = () => {
     finalizeOrder();
   }, [searchParams]);
 
+  useEffect(() => {
+    const savePayment = async () => {
+      const sessionId = searchParams.get('sessionId');
+      const savePref = localStorage.getItem('savePaymentPreference');
+      
+      if (orderId && user && sessionId && savePref === 'true' && !hasSavedPayment.current) {
+        hasSavedPayment.current = true;
+        console.log("💳 Attempting to vault payment method for User:", user.id);
+        
+        try {
+          const sessionRes = await fetch(`${API_BASE_URL}/payments/session/${sessionId}`);
+          const sessionData = await sessionRes.json();
+          
+          const last4 = sessionData.payment_intent_data?.payment_method_options?.card?.last4 || '4242';
+          const brand = sessionData.payment_intent_data?.payment_method_options?.card?.brand || 'visa';
+          
+          const saveUrl = `${API_BASE_URL}/customers/${user.id}/payments?paymentToken=${sessionId}&last4=${last4}&brand=${brand}`;
+          const saveRes = await fetch(saveUrl, { method: 'POST' });
+          
+          if (saveRes.ok) {
+            console.log("✨ Payment method successfully vaulted.");
+            await refreshUser();
+            localStorage.removeItem('savePaymentPreference');
+          } else {
+            console.error("❌ Failed to vault payment method. Status:", saveRes.status);
+          }
+        } catch (e) {
+          console.error("❌ Exception during payment vaulting:", e);
+        }
+      }
+    };
+
+    savePayment();
+  }, [orderId, user, searchParams]);
+
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)', gap: '2rem' }}>
       <div className="animate-spin" style={{ width: '48px', height: '48px', border: '3px solid rgba(44, 62, 45, 0.1)', borderTopColor: 'var(--bg-secondary)', borderRadius: '50%' }}></div>
-      <p style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.1em', opacity: 0.6 }}>ARCHIVING YOUR ACQUISITION...</p>
+      <p style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.1em', opacity: 0.6 }}>FINALIZING YOUR ORDER...</p>
     </div>
   );
 
@@ -69,11 +117,11 @@ const CheckoutSuccess = () => {
         </div>
 
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '3.5rem', marginBottom: '1.5rem', color: 'var(--bg-secondary)', fontWeight: 500 }}>
-          Acquisition Secured
+          Order Confirmed
         </h1>
         
         <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '4rem' }}>
-          Your artisanal selection is now part of your heritage. Our master craftsmen in the Cotswolds are preparing your pieces for their journey to your collection.
+          Your order has been successfully placed. We've sent a confirmation email to your registered address. You can track your order status in your account dashboard.
         </p>
 
         <div style={{ 
@@ -92,12 +140,12 @@ const CheckoutSuccess = () => {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', opacity: 0.8, marginBottom: '0.75rem' }}>
             <span>Status</span>
-            <span style={{ color: 'var(--bg-secondary)', fontWeight: 600 }}>Archived & Committed</span>
+            <span style={{ color: 'var(--bg-secondary)', fontWeight: 600 }}>Confirmed & Processing</span>
           </div>
           
           {orderId && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', opacity: 0.8 }}>
-              <span>Manifest ID</span>
+              <span>Order ID</span>
               <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{orderId}</span>
             </div>
           )}
@@ -105,15 +153,15 @@ const CheckoutSuccess = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <Link to="/" className="btn-primary" style={{ padding: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
-            Return to the Collection <ArrowRight size={20} />
+            Return to Store <ArrowRight size={20} />
           </Link>
           <Link to="/account" style={{ color: 'var(--accent-secondary)', fontWeight: 600, textDecoration: 'none', fontSize: '0.95rem' }}>
-            View your archival records
+            View your order history
           </Link>
         </div>
 
         <div style={{ mt: '6rem', pt: '3rem', borderTop: '1px solid rgba(44, 62, 45, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem', opacity: 0.4, letterSpacing: '0.1em' }}>
-          <ShieldCheck size={14} /> KESTREL SECURE ARCHIVE
+          <ShieldCheck size={14} /> SECURE AGENTIC PLATFORM
         </div>
       </motion.div>
     </div>

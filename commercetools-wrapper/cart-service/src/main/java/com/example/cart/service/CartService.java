@@ -15,4 +15,5 @@ public interface CartService {
     List<ShippingMethod> getShippingMethods(String cartId);
     Cart setCustomerId(String cartId, String customerId);
     Cart removeLineItem(String cartId, String lineItemId);
+    Cart addPayment(String cartId, String paymentId);
 }

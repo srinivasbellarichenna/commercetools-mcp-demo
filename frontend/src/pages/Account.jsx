@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../config/api';
 
 const Account = () => {
   const { user, logout, refreshUser } = useContext(AuthContext);
@@ -22,7 +23,7 @@ const Account = () => {
       refreshUser();
       const fetchOrders = async () => {
         try {
-          const res = await fetch(`http://localhost:8085/api/orders/customer/${user.id}`);
+          const res = await fetch(`${API_BASE_URL}/orders/customer/${user.id}`);
           if (res.ok) {
             const data = await res.json();
             setOrders(data.results || []);
@@ -44,7 +45,7 @@ const Account = () => {
       if (editFirstName !== user.firstName) params.append('firstName', editFirstName);
       if (editLastName !== user.lastName) params.append('lastName', editLastName);
 
-      const res = await fetch(`http://localhost:8085/api/customers/${user.id}/profile?${params.toString()}`, {
+      const res = await fetch(`${API_BASE_URL}/customers/${user.id}/profile?${params.toString()}`, {
         method: 'PATCH'
       });
       if (res.ok) {
@@ -62,7 +63,7 @@ const Account = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8085/api/customers/${user.id}/addresses/${editingAddressId}`, {
+      const res = await fetch(`${API_BASE_URL}/customers/${user.id}/addresses/${editingAddressId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editAddressData)
@@ -81,7 +82,7 @@ const Account = () => {
   const handleRemoveAddress = async (addressId) => {
     if (!window.confirm("Are you sure you wish to remove this destination from your registry?")) return;
     try {
-      const res = await fetch(`http://localhost:8085/api/customers/${user.id}/addresses/${addressId}`, {
+      const res = await fetch(`${API_BASE_URL}/customers/${user.id}/addresses/${addressId}`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -98,7 +99,7 @@ const Account = () => {
     <div className="container" style={{ paddingTop: '160px', minHeight: '80vh', paddingBottom: '120px', background: 'var(--bg-primary)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '5rem', borderBottom: '1px solid rgba(44, 62, 45, 0.1)', paddingBottom: '2rem' }}>
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <p style={{ color: 'var(--accent-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 600, marginBottom: '0.5rem' }}>The Patron's Atelier</p>
+          <p style={{ color: 'var(--accent-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 600, marginBottom: '0.5rem' }}>Customer Portal</p>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '3.5rem', color: 'var(--bg-secondary)', fontWeight: 500 }}>
             Welcome, {user.firstName || user.email}
           </h1>
@@ -109,9 +110,9 @@ const Account = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 1.5fr', gap: '6rem' }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--bg-secondary)', fontSize: '1.8rem', margin: 0 }}>Patron Record</h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--bg-secondary)', fontSize: '1.8rem', margin: 0 }}>Profile Details</h3>
             <button className="btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }} onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? 'Cancel Edit' : 'Modify Registry'}
+              {isEditing ? 'Cancel Edit' : 'Modify Profile'}
             </button>
           </div>
 
@@ -133,14 +134,14 @@ const Account = () => {
                   <input type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} style={inputStyle} />
                 </div>
                 <button type="submit" className="btn-primary" disabled={loading} style={{ padding: '1rem' }}>
-                  {loading ? 'Updating Registry...' : 'Commit Changes'}
+                  {loading ? 'Updating Profile...' : 'Save Changes'}
                 </button>
               </form>
             ) : (
               <>
-                <p style={{ color: 'var(--accent-primary)', marginBottom: '1.25rem', fontWeight: 500 }}><strong style={{ color: 'var(--bg-secondary)', letterSpacing: '0.05em' }}>PATRON:</strong> {user.firstName} {user.lastName}</p>
+                <p style={{ color: 'var(--accent-primary)', marginBottom: '1.25rem', fontWeight: 500 }}><strong style={{ color: 'var(--bg-secondary)', letterSpacing: '0.05em' }}>CUSTOMER:</strong> {user.firstName} {user.lastName}</p>
                 <p style={{ color: 'var(--accent-primary)', marginBottom: '1.25rem', fontWeight: 500 }}><strong style={{ color: 'var(--bg-secondary)', letterSpacing: '0.05em' }}>EMAIL:</strong> {user.email}</p>
-                <p style={{ color: 'var(--accent-primary)', fontWeight: 500 }}><strong style={{ color: 'var(--bg-secondary)', letterSpacing: '0.05em' }}>REGISTRY ID:</strong> {user.id || 'N/A'}</p>
+                <p style={{ color: 'var(--accent-primary)', fontWeight: 500 }}><strong style={{ color: 'var(--bg-secondary)', letterSpacing: '0.05em' }}>ACCOUNT ID:</strong> {user.id || 'N/A'}</p>
               </>
             )}
           </div>
@@ -227,7 +228,7 @@ const Account = () => {
         </div>
 
         <div>
-          <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--bg-secondary)', marginBottom: '2rem', fontSize: '1.8rem' }}>Acquisition History</h3>
+          <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--bg-secondary)', marginBottom: '2rem', fontSize: '1.8rem' }}>Order History</h3>
           {orders.length === 0 ? (
             <div style={{ backgroundColor: 'var(--bg-surface)', padding: '6rem 3rem', border: '1px solid rgba(44, 62, 45, 0.05)', borderRadius: 'var(--border-radius)', textAlign: 'center', color: 'var(--accent-secondary)', boxShadow: 'var(--shadow-soft)' }}>
               <p style={{ fontStyle: 'italic', marginBottom: '2rem', fontSize: '1.1rem' }}>Your personal collection is currently empty.</p>
@@ -238,7 +239,7 @@ const Account = () => {
               {orders.map(o => (
                 <div key={o.id} style={{ padding: '2rem', backgroundColor: 'var(--bg-surface)', border: '1px solid rgba(44, 62, 45, 0.05)', borderRadius: 'var(--border-radius)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'var(--shadow-soft)' }}>
                   <div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--bg-secondary)', marginBottom: '0.5rem', fontWeight: 500 }}>ACQUISITION #{o.orderNumber || o.id.substring(0,8)}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--bg-secondary)', marginBottom: '0.5rem', fontWeight: 500 }}>ORDER #{o.orderNumber || o.id.substring(0,8)}</div>
                     <div style={{ fontSize: '0.9rem', color: 'var(--accent-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                       STATUS: <span style={{ color: '#2C3E2D' }}>{o.orderState}</span>
                     </div>

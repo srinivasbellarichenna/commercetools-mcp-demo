@@ -32,7 +32,7 @@ const Nav = () => {
             color: 'var(--bg-secondary)',
             letterSpacing: '0.15em'
           }}>
-            KESTREL
+            AGENTIC
           </Link>
           
           <div style={{ display: 'flex', gap: '2rem' }}>
@@ -79,7 +79,7 @@ const Nav = () => {
             fontWeight: '600'
           }}>
             <User size={18} />
-            {user ? 'Atelier' : 'Sign In'}
+            {user ? 'Account' : 'Sign In'}
           </Link>
           
           <button style={{ display: 'none', color: 'var(--bg-secondary)' }} className="mobile-menu"><Menu size={24} /></button>

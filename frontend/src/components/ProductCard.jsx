@@ -15,8 +15,8 @@ const ProductCard = ({ product }) => {
                    product.masterData?.current?.masterVariant?.images?.[0]?.url ||
                    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop';
 
-  const title = product.name?.['en-US'] || product.name?.['en-GB'] || product.name?.en || (typeof product.name === 'object' ? Object.values(product.name)[0] : product.name) || 'Artisanal Piece';
-  const description = product.description?.['en-US'] || product.description?.['en-GB'] || product.description?.en || (typeof product.description === 'object' ? Object.values(product.description)[0] : product.description) || 'A timeless addition to your collection, handcrafted with heritage techniques.';
+  const title = product.name?.['en-US'] || product.name?.['en-GB'] || product.name?.en || (typeof product.name === 'object' ? Object.values(product.name)[0] : product.name) || 'Product';
+  const description = product.description?.['en-US'] || product.description?.['en-GB'] || product.description?.en || (typeof product.description === 'object' ? Object.values(product.description)[0] : product.description) || 'A scalable and modular component for your agentic commerce engine.';
 
   return (
     <motion.div 
@@ -36,7 +36,7 @@ const ProductCard = ({ product }) => {
         </div>
         
         <div className="product-info">
-          <div className="product-category">Masterpiece</div>
+          <div className="product-category">Enterprise Standard</div>
           <h3 className="product-title">{title}</h3>
           <div className="product-price">{formattedPrice}</div>
         </div>

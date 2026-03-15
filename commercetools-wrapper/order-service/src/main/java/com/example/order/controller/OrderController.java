@@ -36,4 +36,11 @@ public class OrderController {
             @Parameter(description = "The unique identifier of the customer") @PathVariable String customerId) {
         return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId));
     }
+
+    @Operation(summary = "Get Order by Cart ID")
+    @GetMapping("/cart/{cartId}")
+    public ResponseEntity<com.commercetools.api.models.order.OrderPagedQueryResponse> getOrderByCartId(
+            @Parameter(description = "The unique identifier of the cart") @PathVariable String cartId) {
+        return ResponseEntity.ok(orderService.getOrderByCartId(cartId));
+    }
 }

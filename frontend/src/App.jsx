@@ -33,11 +33,11 @@ function App() {
           marginTop: 'auto'
         }}>
           <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', letterSpacing: '0.1em' }}>
-              KESTREL
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', letterSpacing: '0.15em', fontWeight: 600 }}>
+              AGENTIC COMMERCE
             </div>
             <div style={{ fontSize: '0.8rem', opacity: 0.7, letterSpacing: '0.05em' }}>
-              &copy; {new Date().getFullYear()} KESTREL ATELIER. ALL RIGHTS RESERVED.
+              &copy; {new Date().getFullYear()} COMPOSABLE AGENTIC COMMERCE.
             </div>
           </div>
         </footer>
