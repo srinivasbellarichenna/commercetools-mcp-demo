@@ -18,7 +18,7 @@ logger = logging.getLogger("agentic-mcp")
 
 # Initialize the AGENTIC FastMCP server
 mcp = FastMCP(
-    "agentic-mcp-server",
+    "foundational-mcp-server",
     transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False)
 )
 
@@ -65,6 +65,41 @@ async def get_collection(limit: int = 10, offset: int = 0) -> str:
     except Exception as e:
         logger.error(f"Error in get_collection: {str(e)}")
         return f"Error fetching collection from registry: {str(e)}"
+
+@mcp.tool()
+async def search_products(keyword: str, limit: int = 10, offset: int = 0) -> str:
+    """
+    Search for products matching a specific keyword (e.g. 'minimalist', 'pink', 'chair').
+    
+    Args:
+        keyword: The search term to filter products by name or description.
+        limit: Maximum number of items to retrieve.
+        offset: Number of items to skip.
+    """
+    logger.info(f"Tool Call: search_products(keyword='{keyword}', limit={limit})")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            params = {"keyword": keyword, "limit": limit, "offset": offset}
+            url = f"{API_BASE_URL}/products/search"
+            logger.info(f"Backend Request: GET {url} params={params}")
+            
+            response = await client.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Enrich results (same logic as get_collection)
+            if "results" in data:
+                for product in data["results"]:
+                    product["suggested_variant_id"] = 1
+                    sku = None
+                    if "masterVariant" in product:
+                        sku = product["masterVariant"].get("sku")
+                    product["suggested_sku"] = sku or "missing-sku"
+            
+            return json.dumps(data, indent=2)
+    except Exception as e:
+        logger.error(f"Error in search_products: {str(e)}")
+        return f"Error searching products for '{keyword}': {str(e)}"
 
 @mcp.tool()
 async def get_piece_detail(piece_id: str) -> str:
@@ -223,17 +258,25 @@ async def add_payment_to_cart(cart_id: str, payment_id: str) -> str:
         return f"Error adding payment to cart: {str(e)}"
 
 @mcp.tool()
-async def create_stripe_checkout(cart_id: str) -> str:
+async def create_stripe_checkout(cart_id: str, success_url: Optional[str] = None, cancel_url: Optional[str] = None) -> str:
     """
     Generate a Stripe Checkout URL for the given cart.
     CRITICAL: This tool MUST be called and the resulting URL must be presented to the customer 
     for payment BEFORE calling 'place_order'.
+    
+    Args:
+        cart_id: The ID of the Commercetools Cart.
+        success_url: Optional redirect URL after successful payment.
+        cancel_url: Optional redirect URL after cancelled payment.
     """
     logger.info(f"Tool Call: create_stripe_checkout(cart_id='{cart_id}')")
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             url = f"{API_BASE_URL}/payments/checkout"
             params = {"cartId": cart_id}
+            if success_url: params["successUrl"] = success_url
+            if cancel_url: params["cancelUrl"] = cancel_url
+            
             logger.info(f"Backend Request: POST {url} params={params}")
             
             response = await client.post(url, params=params)
@@ -337,36 +380,6 @@ async def get_cart(cart_id: str) -> str:
         logger.error(f"Error in get_cart: {str(e)}")
         return f"Error fetching cart: {str(e)}"
 
-@mcp.tool()
-async def get_cart(cart_id: str) -> str:
-    """
-    Retrieve the current state of a cart.
-    """
-    logger.info(f"Tool Call: get_cart(cart_id='{cart_id}')")
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            url = f"{API_BASE_URL}/carts/{cart_id}"
-            logger.info(f"Backend Request: GET {url}")
-            
-            response = await client.get(url)
-            
-            if response.status_code == 404:
-                # If cart not found, check if it was already ordered
-                logger.info(f"Cart {cart_id} not found. Checking if it was already ordered...")
-                existing_order = await _check_for_existing_order(cart_id)
-                if existing_order:
-                    return f"NOTICE: This cart ({cart_id}) has been successfully converted to an Order.\n\n{json.dumps(existing_order, indent=2)}"
-            
-            response.raise_for_status()
-            result_str = json.dumps(response.json(), indent=2)
-        return result_str
-    except Exception as e:
-        logger.error(f"Error in get_cart: {str(e)}")
-        # Check for order as a last resort fallback
-        existing_order = await _check_for_existing_order(cart_id)
-        if existing_order:
-             return f"NOTICE: This cart ({cart_id}) has already been converted to an Order.\n\n{json.dumps(existing_order, indent=2)}"
-        return f"Error fetching cart: {str(e)}"
 
 @mcp.tool()
 async def place_order(cart_id: str, version: int) -> str:

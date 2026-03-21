@@ -12,20 +12,38 @@ from specialists.analyst import Analyst
 from specialists.closer import Closer
 from shared.mcp_proxy import MCPProxy
 
-# Configure logging - directed to stderr for MCP protocol safety
-logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+# Configure logging - directed to both stderr (for Claude) and the main container stdout (for Docker logs viewer)
+handlers = [logging.StreamHandler(sys.stderr)]
+if os.path.exists("/proc/1/fd/1"):
+    try:
+        handlers.append(logging.FileHandler("/proc/1/fd/1"))
+    except Exception:
+        pass
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=handlers
+)
 logger = logging.getLogger("orchestrator")
 
 # Initialize FastMCP
-mcp = FastMCP("Agentic-Agency-Orchestrator")
+mcp = FastMCP("Federated-Agents-Orchestrator")
 
-# Shared state and tools
+# Shared state and tools - will be initialized via run_sse.py or manually
 proxy = MCPProxy()
 analyst = Analyst(proxy)
 closer = Closer(proxy)
 
+async def initialize_agency():
+    """
+    Called at app startup to warm the MCP session.
+    """
+    await proxy.initialize()
+    logger.info("Agency: Persistent tools warmed and ready.")
+
 @mcp.tool()
-async def commerce_agent_request(prompt: str, customer_id: str = "") -> str:
+async def commerce_agent_request_v2(prompt: str, customer_id: str = "") -> str:
     """
     The main entry point for the Agentic Agency. It triages the request 
     and delegates to the specialized Analyst or Closer agents.

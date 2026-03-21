@@ -77,8 +77,8 @@ services:
     depends_on:
       - api-gateway
 
-  mcp-server:
-    build: ../agency/mcp-server
+  foundational-mcp-server:
+    build: ../foundational-mcp-server
     ports:
       - "8087:8000"
     networks:
@@ -94,29 +94,43 @@ services:
       - commercetools-net
     environment:
       - LM_STUDIO_URL=http://host.docker.internal:1234/v1
-      - MCP_SERVER_SSE_URL=http://mcp-server:8000/sse
-      - MODEL_NAME=meta-llama-3-8b-instruct
+      - MCP_SERVER_SSE_URL=http://foundational-mcp-server:8000/sse
+      - MODEL_NAME=qwen3-4b-instruct-2507-mlx
       - DEFINITIVE_SUCCESS=true
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
-      - mcp-server
+      - foundational-mcp-server
 
-  federated-agents:
-    build: ../federated-agents
+#  federated-agents:
+#    build: ../federated-agents
+#    ports:
+#      - "8088:8000"
+#    networks:
+#      - commercetools-net
+#    environment:
+#      - API_BASE_URL=http://api-gateway:8080/api
+#      - LM_STUDIO_URL=http://host.docker.internal:1234/v1
+#      - MODEL_NAME=qwen3-4b-instruct-2507-mlx
+#      - MCP_SERVER_SSE_URL=http://foundational-mcp-server:8000/sse
+#    depends_on:
+#      - api-gateway
+#      - foundational-mcp-server
+
+  federated-agents-v2:
+    build: ../federated-agents-v2
     ports:
-      - "8088:8000"
+      - "8090:8000"
     networks:
       - commercetools-net
     environment:
       - API_BASE_URL=http://api-gateway:8080/api
       - LM_STUDIO_URL=http://host.docker.internal:1234/v1
-      - MODEL_NAME=meta-llama-3-8b-instruct
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - MODEL_NAME=qwen3-4b-instruct-2507-mlx
+      - MCP_SERVER_SSE_URL=http://foundational-mcp-server:8000/sse
+      - AGENT_API_KEY=${AGENT_API_KEY:-prod-secret-123}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       - api-gateway
-      - mcp-server
+      - foundational-mcp-server
 
 networks:
   commercetools-net:

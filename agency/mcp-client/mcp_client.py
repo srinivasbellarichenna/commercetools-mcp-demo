@@ -22,7 +22,7 @@ logger = logging.getLogger("agentic-mcp-client")
 # Environment variables
 LM_STUDIO_URL = os.getenv("LM_STUDIO_URL", "http://host.docker.internal:1234/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama-3-8b-instruct")
-MCP_SERVER_SSE_URL = os.getenv("MCP_SERVER_SSE_URL", "http://mcp-server:8087/sse")
+MCP_SERVER_SSE_URL = os.getenv("MCP_SERVER_SSE_URL", "http://foundational-mcp-server:8000/sse")
 DEFINITIVE_SUCCESS = os.getenv("DEFINITIVE_SUCCESS", "false").lower() == "true"
 
 client = OpenAI(base_url=LM_STUDIO_URL, api_key="lm-studio")

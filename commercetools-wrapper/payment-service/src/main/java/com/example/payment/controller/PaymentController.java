@@ -4,6 +4,7 @@ import com.example.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,15 +16,21 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Operation(summary = "Create a Stripe Checkout Session")
     @PostMapping("/checkout")
     public ResponseEntity<Map<String, String>> createCheckoutSession(
             @Parameter(description = "ID of the Commercetools Cart") @RequestParam String cartId,
-            @Parameter(description = "Success redirect URL") @RequestParam(defaultValue = "http://localhost:5173/checkout/success") String successUrl,
-            @Parameter(description = "Cancel redirect URL") @RequestParam(defaultValue = "http://localhost:5173/cart") String cancelUrl) {
+            @Parameter(description = "Success redirect URL") @RequestParam(required = false) String successUrl,
+            @Parameter(description = "Cancel redirect URL") @RequestParam(required = false) String cancelUrl) {
             
-        String checkoutUrl = paymentService.createCheckoutSession(cartId, successUrl, cancelUrl);
+        String effectiveSuccessUrl = (successUrl != null && !successUrl.isEmpty()) ? successUrl : frontendUrl + "/checkout/success";
+        String effectiveCancelUrl = (cancelUrl != null && !cancelUrl.isEmpty()) ? cancelUrl : frontendUrl + "/cart";
+            
+        String checkoutUrl = paymentService.createCheckoutSession(cartId, effectiveSuccessUrl, effectiveCancelUrl);
         return ResponseEntity.ok(Map.of("url", checkoutUrl));
     }
 

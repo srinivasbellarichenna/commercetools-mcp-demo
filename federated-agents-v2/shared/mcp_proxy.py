@@ -6,6 +6,7 @@ import asyncio
 from typing import Dict, Any, List, Optional
 from mcp import ClientSession
 from mcp.client.sse import sse_client
+from shared.mcp_contract import map_and_validate_args, MCPContractException
 
 import contextlib
 
@@ -54,11 +55,21 @@ class MCPProxy:
             return []
 
     async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Executes a tool call on a fresh session."""
-        logger.info(f"MCP-Proxy: Calling '{tool_name}'...")
+        """Executes a tool call on a fresh session with strict contract checking."""
+        logger.info(f"MCP-Proxy: Preparing call to '{tool_name}'...")
         try:
+            # 1. Map & Validate Strict Requirements
+            try:
+                mapped_arguments = map_and_validate_args(tool_name, arguments)
+            except MCPContractException as ce:
+                logger.error(f"[MCP BOUNDARY REJECTION] {ce}")
+                return {"error": str(ce)}
+                
+            # 2. Input Echo Logging (Crucial Boundary Safety)
+            logger.info(f"[MCP CALL ECHO] action: '{tool_name}' | original_args: {arguments} | mapped_args: {mapped_arguments}")
+            
             async with self.get_session() as session:
-                result = await session.call_tool(tool_name, arguments)
+                result = await session.call_tool(tool_name, mapped_arguments)
                 logger.info(f"MCP-Proxy: Result for '{tool_name}' received.")
                 
                 if hasattr(result, 'content'):
@@ -68,10 +79,14 @@ class MCPProxy:
                         if hasattr(item, 'text'):
                             full_content += item.text
                     
-                    logger.info(f"MCP-Proxy: Parsed content: {full_content[:100]}")
+                    logger.info(f"MCP-Proxy: Raw content length: {len(full_content)}")
+                    logger.debug(f"MCP-Proxy: Raw content snippet: {full_content[:500]}")
                     try:
-                        return json.loads(full_content)
-                    except:
+                        parsed = json.loads(full_content)
+                        logger.info(f"MCP-Proxy: Successfully parsed JSON. Type: {type(parsed)}")
+                        return parsed
+                    except Exception as e:
+                        logger.warning(f"MCP-Proxy: Failed to parse JSON: {e}")
                         return {"raw": full_content}
                 
                 return {"result": str(result)}

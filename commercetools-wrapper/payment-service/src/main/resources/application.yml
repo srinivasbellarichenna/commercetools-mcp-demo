@@ -5,6 +5,9 @@ spring:
   application:
     name: payment-service
 
+frontend:
+  url: ${FRONTEND_URL:http://localhost:3001}
+
 commercetools:
   projectKey: ${CTP_PROJECT_KEY}
   clientId: ${CTP_CLIENT_ID}

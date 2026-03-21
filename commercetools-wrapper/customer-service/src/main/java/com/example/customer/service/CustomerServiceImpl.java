@@ -58,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .getResults()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));
+                .orElse(null);
     }
 
     @Override
