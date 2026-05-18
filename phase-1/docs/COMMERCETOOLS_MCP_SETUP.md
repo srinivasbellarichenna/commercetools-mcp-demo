@@ -24,6 +24,12 @@ npx -y mcp-remote --url https://docs.commercetools.com/apis/mcp
 }
 ```
 
+**Gemini CLI Configuration:**
+Run the following command to register the server with your local `gemini-cli` environment:
+```bash
+gemini mcp add commercetools-dev-content npx -- -y mcp-remote --url https://docs.commercetools.com/apis/mcp
+```
+
 ## 2. Commerce MCP
 The Commerce MCP (`@commercetools/commerce-mcp`) allows AI agents to interact directly with your Composable Commerce Project (e.g., managing products, carts, orders).
 
@@ -61,6 +67,12 @@ To use this server, you must provide your commercetools API credentials:
     }
   }
 }
+```
+
+**Gemini CLI Configuration:**
+Run the following command to register the server with your local `gemini-cli` environment:
+```bash
+gemini mcp add commercetools-commerce npx -- -y @commercetools/commerce-mcp --tools=all -e PROJECT_KEY="mcp-demo" -e AUTH_URL="https://auth.eu-central-1.aws.commercetools.com" -e API_URL="https://api.eu-central-1.aws.commercetools.com" -e AUTH_TYPE="client_credentials" -e CLIENT_ID="OKZUKU1YHWR9sJGvIfENuBhl" -e CLIENT_SECRET="7PgSQV8vQhGC9hU2wEzJrwGsSVItaANR" -e TOOLS="all" -e IS_ADMIN="true"
 ```
 
 ## Next Steps
