@@ -4,44 +4,24 @@ Welcome to **Composable Agentic Commerce**, a demonstration of Commercetools mic
 
 ## 🏛️ Project Architecture
 
-The project is organized into clear layers to ensure architectural clarity:
+The project is strategically organized into two main phases to ensure architectural clarity and steady maturation:
 
-### 1. [Frontend Application](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/frontend)
-The customer-facing storefront, providing a modern visual experience.
+### 🌟 [Phase 1: Foundation Layer](./phase-1/README.md)
+The core infrastructure necessary to run the e-commerce operations. This includes the microservices backend, frontend storefront, and the foundational MCP server.
 
-### 2. [Backend Foundation](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/commercetools-wrapper)
-The core microservice ecosystem, featuring:
-- **Product Service**: Inventory and discovery.
-- **Cart Service**: Shopping cart and checkout management.
-- **Order Service**: Finalized order records.
+### 🤖 [Phase 2: Agency Enhancements](./phase-2/README.md)
+The experimental AI agent-based features and federated orchestrators. This includes specialized autonomous clients and agent routing systems.
 
-### 2. [Agency Layer](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/agency)
-The orchestration bridges for AI integration:
-- **MCP Server**: A custom Python bridge (SSE) providing e-commerce tools.
-- **MCP Client**: An autonomous agent powered by local LLMs (Llama 3).
+### 📚 Global Resources
+Resources that apply across the entire project:
+- **[Development Skills](./skills)**: Domain-specific resources for AI agents.
+- **[Global Documentation](./docs)**: Roadmaps, architectural fit-gap analysis, and walkthroughs.
 
-### 3. [Documentation & Guides](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs)
-Essential blueprints for setup and integration:
-- [🏺 Local Setup Guide](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/LOCAL_SETUP_GUIDE.md) — **Start Here**
-- [🗺️ Project Roadmap](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/ROADMAP.md) — **Future Vision**
-- [Agentic Commerce Integration](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/docs/AGENTIC_COMMERCE_INTEGRATION.md)
-- [Official Commercetools MCP Setup](file:///Users/srinivasbellarichenna/Personal/dev/ai-projects/antigravity_workspace/commercetools-mcp-demo/docs/COMMERCETOOLS_MCP_SETUP.md)
+## 🎭 Quick Start
 
-### 4. [Development Skills](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/skills)
-Domain-specific resources for AI agents:
-- [commercetools-api](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/skills/commercetools-api.md)
-- [commercetools-frontend](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/skills/commercetools-frontend.md)
-- [commercetools-headless-commerce](file:///Users/srinivasbellarichenna/Personal/dev/genai-projects/antigravity_workspace/commercetools-mcp-demo/skills/commercetools-headless-commerce.md)
-
-## 🎭 Running the Autonomous Agent
-
-To witness the AI agent placing an order:
-```bash
-cd commercetools-wrapper
-docker compose up -d --build
-# Monitor the client logs for success
-docker logs -f commercetools-wrapper-mcp-client-1
-```
+To witness the foundation and AI agent in action, please refer to the respective phase documentation:
+- [Phase 1 Getting Started](./phase-1/README.md#getting-started)
+- [Phase 2 Agent Setup](./phase-2/docs/LOCAL_SETUP_GUIDE.md)
 
 ---
 *Composable Agentic Commerce - Established 2026*

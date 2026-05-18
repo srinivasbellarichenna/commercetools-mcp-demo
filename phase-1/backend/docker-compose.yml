@@ -1,11 +1,10 @@
-x-common-env: &common-env
-  SPRING_PROFILES_ACTIVE: docker
+x-ctp-env: &ctp-env
   CTP_PROJECT_KEY: ${PROJECT_KEY}
   CTP_CLIENT_ID: ${CLIENT_ID}
   CTP_CLIENT_SECRET: ${CLIENT_SECRET}
   CTP_AUTH_URL: ${AUTH_URL}
   CTP_API_URL: ${API_URL}
-  STRIPE_SECRET_KEY: sk_test_51T3OLzRAX7PsnzgqbkxrLmzGL6aJfauW2wpDbdOYQMRANalbixoimqk1u5nllMFQL7gtDDE6tvXgNoVfR7opoyOe00nBQmcS7K
+  CTP_SCOPES: "manage_project:${PROJECT_KEY}"
 
 services:
   product-service:
@@ -15,7 +14,12 @@ services:
     networks:
       - commercetools-net
     environment:
-      <<: *common-env
+      <<: *ctp-env
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   cart-service:
     build: cart-service
@@ -24,7 +28,12 @@ services:
     networks:
       - commercetools-net
     environment:
-      <<: *common-env
+      <<: *ctp-env
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   customer-service:
     build: customer-service
@@ -33,7 +42,12 @@ services:
     networks:
       - commercetools-net
     environment:
-      <<: *common-env
+      <<: *ctp-env
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   payment-service:
     build: payment-service
@@ -42,7 +56,13 @@ services:
     networks:
       - commercetools-net
     environment:
-      <<: *common-env
+      <<: *ctp-env
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   order-service:
     build: order-service
@@ -51,7 +71,12 @@ services:
     networks:
       - commercetools-net
     environment:
-      <<: *common-env
+      <<: *ctp-env
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   api-gateway:
     build: api-gateway
@@ -60,13 +85,17 @@ services:
     networks:
       - commercetools-net
     environment:
-      <<: *common-env
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     depends_on:
       - product-service
       - cart-service
       - customer-service
       - payment-service
       - order-service
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   frontend:
     build: ../frontend
@@ -76,6 +105,10 @@ services:
       - commercetools-net
     depends_on:
       - api-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   foundational-mcp-server:
     build: ../foundational-mcp-server
@@ -87,33 +120,10 @@ services:
       - API_BASE_URL=http://api-gateway:8080/api
     depends_on:
       - api-gateway
-
-  mcp-client:
-    build: ../agency/mcp-client
-    networks:
-      - commercetools-net
-    environment:
-      - LM_STUDIO_URL=http://host.docker.internal:1234/v1
-      - MCP_SERVER_SSE_URL=http://foundational-mcp-server:8000/sse
-      - MODEL_NAME=qwen3-4b-instruct-2507-mlx
-      - DEFINITIVE_SUCCESS=true
-    depends_on:
-      - foundational-mcp-server
-
-#  federated-agents:
-#    build: ../federated-agents
-#    ports:
-#      - "8088:8000"
-#    networks:
-#      - commercetools-net
-#    environment:
-#      - API_BASE_URL=http://api-gateway:8080/api
-#      - LM_STUDIO_URL=http://host.docker.internal:1234/v1
-#      - MODEL_NAME=qwen3-4b-instruct-2507-mlx
-#      - MCP_SERVER_SSE_URL=http://foundational-mcp-server:8000/sse
-#    depends_on:
-#      - api-gateway
-#      - foundational-mcp-server
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
   federated-agents-v2:
     build: ../federated-agents-v2
@@ -124,13 +134,17 @@ services:
     environment:
       - API_BASE_URL=http://api-gateway:8080/api
       - LM_STUDIO_URL=http://host.docker.internal:1234/v1
-      - MODEL_NAME=qwen3-4b-instruct-2507-mlx
+      - MODEL_NAME=qwen3.5-9b
       - MCP_SERVER_SSE_URL=http://foundational-mcp-server:8000/sse
       - AGENT_API_KEY=${AGENT_API_KEY:-prod-secret-123}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       - api-gateway
       - foundational-mcp-server
+    deploy:
+      resources:
+        limits:
+          memory: 600M
 
 networks:
   commercetools-net:
