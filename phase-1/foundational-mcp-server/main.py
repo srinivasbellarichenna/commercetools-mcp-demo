@@ -362,6 +362,26 @@ async def set_shipping_address(cart_id: str, first_name: str, last_name: str, st
         return f"Error setting shipping address: {str(e)}"
 
 @mcp.tool()
+async def set_cart_customer(cart_id: str, customer_id: str) -> str:
+    """
+    Associate an existing customer profile with an anonymous shopping cart.
+    """
+    logger.info(f"Tool Call: set_cart_customer(cart_id='{cart_id}', customer_id='{customer_id}')")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            url = f"{API_BASE_URL}/carts/{cart_id}/customer"
+            params = {"customerId": customer_id}
+            logger.info(f"Backend Request: POST {url} params={params}")
+            
+            response = await client.post(url, params=params)
+            response.raise_for_status()
+            result_str = json.dumps(response.json(), indent=2)
+        return result_str
+    except Exception as e:
+        logger.error(f"Error in set_cart_customer: {str(e)}")
+        return f"Error setting customer on cart: {str(e)}"
+
+@mcp.tool()
 async def get_cart(cart_id: str) -> str:
     """
     Retrieve the current state of a cart.
