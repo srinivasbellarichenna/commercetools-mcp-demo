@@ -126,6 +126,7 @@ const Checkout = () => {
         await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-method?shippingMethodId=${formData.shippingMethodId}`, {
           method: 'POST',
         });
+        await refreshCart();
         setStep(4);
       } catch (e) {
         console.error("Failed to set shipping method", e);
@@ -363,7 +364,7 @@ const Checkout = () => {
               <div style={{ backgroundColor: 'var(--bg-surface)', padding: '3rem', borderRadius: 'var(--border-radius)', marginBottom: '3rem', boxShadow: 'var(--shadow-soft)', border: '1px solid rgba(44, 62, 45, 0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem', color: 'var(--accent-primary)', fontWeight: 500, opacity: 0.8 }}>
                   <span>Subtotal</span>
-                  <span>{cart.totalPrice.centAmount / 100} {cart.totalPrice.currencyCode}</span>
+                  <span>{(cart.totalPrice.centAmount - (cart.shippingInfo?.price?.centAmount || 0)) / 100} {cart.totalPrice.currencyCode}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem', color: 'var(--accent-primary)', fontWeight: 500, opacity: 0.8 }}>
                   <span>Delivery</span>
@@ -371,6 +372,7 @@ const Checkout = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '1.6rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(44, 62, 45, 0.1)', color: 'var(--bg-secondary)', marginTop: '1rem' }}>
                   <span>Total Due</span>
+                  <span>{cart.totalPrice.centAmount / 100} {cart.totalPrice.currencyCode}</span>
                 </div>
               </div>
 

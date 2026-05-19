@@ -13,8 +13,19 @@ Welcome to the **Foundation Layer** of the Composable Agentic Commerce project. 
 
 ## 🚀 Getting Started
 
-To spin up the foundation layer:
+### 1. Environment Configuration
+Navigate into the backend directory and set up your environment variables:
 ```bash
 cd backend
+cp .env.example .env
+```
+Open the `.env` file and fill in your Commercetools API and Stripe credentials.
+
+### 2. Compile and Start Services
+Compile the Java microservices and spin up the entire foundation layer (Backend Microservices, Frontend React App, and the Foundational MCP Server):
+```bash
+# From inside the backend directory
+mvn clean package -DskipTests
 docker compose up -d --build
 ```
+This single Docker Compose command will containerize and start all Phase 1 components.

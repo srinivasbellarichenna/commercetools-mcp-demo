@@ -56,12 +56,12 @@ To use this server, you must provide your commercetools API credentials:
     "command": "npx",
     "args": ["-y", "@commercetools/commerce-mcp", "--tools=all"],
     "env": {
-      "PROJECT_KEY": "mcp-demo",
+      "PROJECT_KEY": "ct-mcp-demo",
       "AUTH_URL": "https://auth.eu-central-1.aws.commercetools.com",
       "API_URL": "https://api.eu-central-1.aws.commercetools.com",
       "AUTH_TYPE": "client_credentials",
-      "CLIENT_ID": "OKZUKU1YHWR9sJGvIfENuBhl",
-      "CLIENT_SECRET": "7PgSQV8vQhGC9hU2wEzJrwGsSVItaANR",
+      "CLIENT_ID": "ErWaBCfIJIJIn6gljQnpZY_D",
+      "CLIENT_SECRET": "URnD9aB69DJRTcf5Q2yqyAvK9SSAjp2c",
       "TOOLS": "all",
       "IS_ADMIN": "true"
     }
@@ -72,7 +72,7 @@ To use this server, you must provide your commercetools API credentials:
 **Gemini CLI Configuration:**
 Run the following command to register the server with your local `gemini-cli` environment:
 ```bash
-gemini mcp add commercetools-commerce npx -- -y @commercetools/commerce-mcp --tools=all -e PROJECT_KEY="mcp-demo" -e AUTH_URL="https://auth.eu-central-1.aws.commercetools.com" -e API_URL="https://api.eu-central-1.aws.commercetools.com" -e AUTH_TYPE="client_credentials" -e CLIENT_ID="OKZUKU1YHWR9sJGvIfENuBhl" -e CLIENT_SECRET="7PgSQV8vQhGC9hU2wEzJrwGsSVItaANR" -e TOOLS="all" -e IS_ADMIN="true"
+gemini mcp add commercetools-commerce npx -- -y @commercetools/commerce-mcp --tools=all -e PROJECT_KEY="ct-mcp-demo" -e AUTH_URL="https://auth.eu-central-1.aws.commercetools.com" -e API_URL="https://api.eu-central-1.aws.commercetools.com" -e AUTH_TYPE="client_credentials" -e CLIENT_ID="ErWaBCfIJIJIn6gljQnpZY_D" -e CLIENT_SECRET="URnD9aB69DJRTcf5Q2yqyAvK9SSAjp2c" -e TOOLS="all" -e IS_ADMIN="true"
 ```
 
 ## Next Steps
