@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.example.customer.dto.AddressRequestDTO;
+import com.example.customer.dto.CustomerLoginRequestDTO;
+import com.example.customer.dto.CustomerRegisterRequestDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,19 +27,16 @@ public class CustomerController {
     @Operation(summary = "Register a new Customer")
     @PostMapping("/register")
     public ResponseEntity<CustomerSignInResult> registerCustomer(
-            @Parameter(description = "User's email address") @RequestParam String email,
-            @Parameter(description = "User's password") @RequestParam String password,
-            @Parameter(description = "User's first name") @RequestParam(required = false) String firstName,
-            @Parameter(description = "User's last name") @RequestParam(required = false) String lastName) {
-        return ResponseEntity.ok(customerService.registerCustomer(email, password, firstName, lastName));
+            @Valid @RequestBody CustomerRegisterRequestDTO request) {
+        return ResponseEntity.ok(customerService.registerCustomer(
+                request.getEmail(), request.getPassword(), request.getFirstName(), request.getLastName()));
     }
 
     @Operation(summary = "Login an existing Customer")
     @PostMapping("/login")
     public ResponseEntity<CustomerSignInResult> loginCustomer(
-            @Parameter(description = "User's email address") @RequestParam String email,
-            @Parameter(description = "User's password") @RequestParam String password) {
-        return ResponseEntity.ok(customerService.loginCustomer(email, password));
+            @Valid @RequestBody CustomerLoginRequestDTO request) {
+        return ResponseEntity.ok(customerService.loginCustomer(request.getEmail(), request.getPassword()));
     }
 
     @Operation(summary = "Get Customer Profile")
@@ -102,8 +103,8 @@ public class CustomerController {
     @PostMapping("/{customerId}/addresses")
     public ResponseEntity<Customer> addAddress(
             @PathVariable String customerId,
-            @RequestBody com.commercetools.api.models.common.BaseAddress address) {
-        return ResponseEntity.ok(customerService.addAddress(customerId, address));
+            @Valid @RequestBody AddressRequestDTO addressDto) {
+        return ResponseEntity.ok(customerService.addAddress(customerId, mapToAddress(addressDto)));
     }
 
     @Operation(summary = "Remove Address from Customer Profile")
@@ -129,8 +130,38 @@ public class CustomerController {
     public ResponseEntity<Customer> changeAddress(
             @PathVariable String customerId,
             @PathVariable String addressId,
-            @RequestBody com.commercetools.api.models.common.BaseAddress address) {
-        return ResponseEntity.ok(customerService.changeAddress(customerId, addressId, address));
+            @Valid @RequestBody AddressRequestDTO addressDto) {
+        return ResponseEntity.ok(customerService.changeAddress(customerId, addressId, mapToAddress(addressDto)));
+    }
+
+    private com.commercetools.api.models.common.BaseAddress mapToAddress(AddressRequestDTO dto) {
+        return com.commercetools.api.models.common.BaseAddress.builder()
+                .country(dto.getCountry())
+                .id(dto.getId())
+                .key(dto.getKey())
+                .title(dto.getTitle())
+                .salutation(dto.getSalutation())
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .streetName(dto.getStreetName())
+                .streetNumber(dto.getStreetNumber())
+                .additionalStreetInfo(dto.getAdditionalStreetInfo())
+                .postalCode(dto.getPostalCode())
+                .city(dto.getCity())
+                .region(dto.getRegion())
+                .state(dto.getState())
+                .company(dto.getCompany())
+                .department(dto.getDepartment())
+                .building(dto.getBuilding())
+                .apartment(dto.getApartment())
+                .pOBox(dto.getPOBox())
+                .phone(dto.getPhone())
+                .mobile(dto.getMobile())
+                .email(dto.getEmail())
+                .fax(dto.getFax())
+                .additionalAddressInfo(dto.getAdditionalAddressInfo())
+                .externalId(dto.getExternalId())
+                .build();
     }
 
     @Operation(summary = "Add Payment Method to Customer Profile")

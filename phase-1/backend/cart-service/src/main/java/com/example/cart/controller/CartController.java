@@ -5,6 +5,8 @@ import com.example.cart.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import com.example.cart.dto.AddressRequestDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,16 +44,46 @@ public class CartController {
     @PostMapping("/{cartId}/shipping-address")
     public ResponseEntity<Cart> setShippingAddress(
             @PathVariable String cartId,
-            @RequestBody com.commercetools.api.models.common.Address address) {
-        return ResponseEntity.ok(cartService.setShippingAddress(cartId, address));
+            @Valid @RequestBody AddressRequestDTO addressDto) {
+        return ResponseEntity.ok(cartService.setShippingAddress(cartId, mapToAddress(addressDto)));
     }
 
     @Operation(summary = "Set Billing Address")
     @PostMapping("/{cartId}/billing-address")
     public ResponseEntity<Cart> setBillingAddress(
             @PathVariable String cartId,
-            @RequestBody com.commercetools.api.models.common.Address address) {
-        return ResponseEntity.ok(cartService.setBillingAddress(cartId, address));
+            @Valid @RequestBody AddressRequestDTO addressDto) {
+        return ResponseEntity.ok(cartService.setBillingAddress(cartId, mapToAddress(addressDto)));
+    }
+
+    private com.commercetools.api.models.common.BaseAddress mapToAddress(AddressRequestDTO dto) {
+        return com.commercetools.api.models.common.BaseAddress.builder()
+                .country(dto.getCountry())
+                .id(dto.getId())
+                .key(dto.getKey())
+                .title(dto.getTitle())
+                .salutation(dto.getSalutation())
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .streetName(dto.getStreetName())
+                .streetNumber(dto.getStreetNumber())
+                .additionalStreetInfo(dto.getAdditionalStreetInfo())
+                .postalCode(dto.getPostalCode())
+                .city(dto.getCity())
+                .region(dto.getRegion())
+                .state(dto.getState())
+                .company(dto.getCompany())
+                .department(dto.getDepartment())
+                .building(dto.getBuilding())
+                .apartment(dto.getApartment())
+                .pOBox(dto.getPOBox())
+                .phone(dto.getPhone())
+                .mobile(dto.getMobile())
+                .email(dto.getEmail())
+                .fax(dto.getFax())
+                .additionalAddressInfo(dto.getAdditionalAddressInfo())
+                .externalId(dto.getExternalId())
+                .build();
     }
 
     @Operation(summary = "Set Shipping Method")
