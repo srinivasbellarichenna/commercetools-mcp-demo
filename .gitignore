@@ -34,6 +34,7 @@ docker-compose.override.yml
 # Project Specific
 .env
 .env.*
+!.env.example
 *.postman_dump.json
 .gemini/
 .agents/
