@@ -23,7 +23,7 @@ The Foundation Layer is divided into three primary domains. For an in-depth unde
 
 ### 📸 Visual Proof
 <div align="center">
-  <video src="./phase-1/docs/assets/ecom_demo_video.mov" width="100%" controls></video>
+  <video src="./phase-1/docs/assets/ecom_demo_video.mp4" width="100%" controls></video>
 </div>
 
 ### 1. [Backend Microservices](./phase-1/backend)
