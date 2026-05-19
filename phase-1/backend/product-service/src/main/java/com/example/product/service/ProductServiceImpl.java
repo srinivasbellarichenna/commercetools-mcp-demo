@@ -16,13 +16,25 @@ public class ProductServiceImpl implements ProductService {
     private final ProjectApiRoot apiRoot;
 
     @Override
-    public Mono<ProductProjectionPagedQueryResponse> getProducts(int limit, int offset) {
-        return Mono.fromFuture(() -> apiRoot.productProjections()
-                .get()
-                .withLimit(limit)
-                .withOffset(offset)
-                .execute()
-                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody));
+    public Mono<ProductProjectionPagedSearchResponse> getProducts(String text, String sort, int limit, int offset) {
+        return Mono.fromFuture(() -> {
+            var request = apiRoot.productProjections()
+                    .search()
+                    .post()
+                    .withStaged(false)
+                    .withLimit(limit)
+                    .withOffset(offset);
+                    
+            if (text != null && !text.isEmpty()) {
+                request = request.withText("en-US", text);
+            }
+            if (sort != null && !sort.isEmpty()) {
+                request = request.withSort(sort);
+            }
+            
+            return request.execute()
+                    .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody);
+        }).doOnError(e -> log.error("Error fetching products with search: {}", e.getMessage(), e));
     }
 
     @Override

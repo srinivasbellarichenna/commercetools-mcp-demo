@@ -19,7 +19,8 @@ const ProductGrid = () => {
       if (!isAppend) setLoading(true);
       else setLoadingMore(true);
 
-      const url = `${API_BASE_URL}/products?limit=${limit}&offset=${newOffset}&sort=${sort}${search ? `&text=${search}` : ''}`;
+      const actualSort = sort === 'relevance' ? '' : sort;
+      const url = `${API_BASE_URL}/products?limit=${limit}&offset=${newOffset}${actualSort ? `&sort=${actualSort}` : ''}${search ? `&text=${search}` : ''}`;
       const res = await fetch(url);
       const data = await res.json();
       
@@ -69,7 +70,14 @@ const ProductGrid = () => {
                 type="text" 
                 placeholder="Search collection..." 
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  if (e.target.value && sort !== 'relevance') {
+                    setSort('relevance');
+                  } else if (!e.target.value && sort === 'relevance') {
+                    setSort('price asc');
+                  }
+                }}
                 style={{ paddingLeft: '3rem', border: '1px solid rgba(44, 62, 45, 0.1)', background: 'var(--bg-surface)', color: 'var(--bg-secondary)' }}
               />
             </div>
@@ -81,6 +89,7 @@ const ProductGrid = () => {
                 onChange={(e) => setSort(e.target.value)}
                 style={{ paddingLeft: '3rem', appearance: 'none', background: 'var(--bg-surface)', border: '1px solid rgba(44, 62, 45, 0.1)', cursor: 'pointer' }}
               >
+                <option value="relevance">Relevance</option>
                 <option value="price asc">Price: Low to High</option>
                 <option value="price desc">Price: High to Low</option>
                 <option value="name.en asc">Name: A to Z</option>
@@ -90,8 +99,14 @@ const ProductGrid = () => {
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem 0' }}>
-            <Loader2 className="animate-spin" size={40} style={{ color: 'var(--bg-secondary)', opacity: 0.5 }} />
+          <div className="product-grid" style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+            gap: '2.5rem' 
+          }}>
+            {[...Array(limit)].map((_, i) => (
+              <ProductCard key={`skeleton-${i}`} isSkeleton={true} index={i} />
+            ))}
           </div>
         ) : (
           <motion.div 
@@ -104,8 +119,8 @@ const ProductGrid = () => {
             }}
           >
             <AnimatePresence mode="popLayout">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {products.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
               ))}
             </AnimatePresence>
           </motion.div>

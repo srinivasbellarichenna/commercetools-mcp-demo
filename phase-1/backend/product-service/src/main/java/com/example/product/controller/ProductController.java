@@ -21,11 +21,13 @@ public class ProductController {
 
     @Operation(summary = "Get a list of Commercetools products", description = "Fetches a paginated list of published products from the Commercetools catalog.")
     @GetMapping
-    public Mono<ResponseEntity<ProductProjectionPagedQueryResponse>> getProducts(
+    public Mono<ResponseEntity<ProductProjectionPagedSearchResponse>> getProducts(
+            @Parameter(description = "Text keyword to search the catalog for") @RequestParam(required = false) String text,
+            @Parameter(description = "Sort parameters") @RequestParam(required = false) String sort,
             @Parameter(description = "The maximum number of products to return") @RequestParam(defaultValue = "20") int limit,
             @Parameter(description = "The number of products to skip for pagination") @RequestParam(defaultValue = "0") int offset) {
-        log.info("Received request to fetch products: limit={}, offset={}", limit, offset);
-        return productService.getProducts(limit, offset)
+        log.info("Received request to fetch products: text={}, sort={}, limit={}, offset={}", text, sort, limit, offset);
+        return productService.getProducts(text, sort, limit, offset)
                 .doOnNext(response -> log.info("Successfully fetched {} products", response.getCount()))
                 .map(ResponseEntity::ok)
                 .doOnError(e -> log.error("Error fetching products: {}", e.getMessage(), e));
