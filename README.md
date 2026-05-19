@@ -9,6 +9,11 @@ This repository branch contains the **Foundation Layer** (Phase 1) of the archit
 ### 🌟 [Phase 1: Foundation Layer](./phase-1/README.md)
 The core infrastructure necessary to run the e-commerce operations. This includes the microservices backend, frontend storefront, and the foundational MCP server.
 
+**Detailed Phase 1 Documentation:**
+- **Backend Microservices**: [README](./phase-1/backend/README.md) | [Architectural Walkthrough](./phase-1/backend/walkthrough.md)
+- **Frontend Application**: [README](./phase-1/frontend/README.md) | [Architectural Walkthrough](./phase-1/frontend/walkthrough.md)
+- **Foundational MCP Server**: [README](./phase-1/foundational-mcp-server/README.md) | [Architectural Walkthrough](./phase-1/foundational-mcp-server/walkthrough.md)
+
 ### 📚 Global Resources
 Resources that apply across the entire project:
 - **[Development Skills](./skills)**: Domain-specific resources for AI agents.
