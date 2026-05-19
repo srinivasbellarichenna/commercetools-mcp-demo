@@ -48,6 +48,9 @@ To configure Claude Desktop to use the foundational server, you must edit its gl
 
 Add the `foundational-mcp` definition to your `mcpServers` block. 
 
+### Option A: Connecting to the Local Python Environment
+
+Use this if you manually installed the Python virtual environment.
 > **Important**: Replace `/ABSOLUTE/PATH/TO/...` with the actual path to your repository clone!
 
 ```json
@@ -66,13 +69,43 @@ Add the `foundational-mcp` definition to your `mcpServers` block.
 }
 ```
 
+### Option B: Connecting to the Docker Container (Recommended)
+
+If you have already spun up the entire foundation layer using `docker compose up -d`, the MCP server is actively running inside a container. You can attach Claude Desktop directly to this running container without needing to configure Python on your host machine!
+
+```json
+{
+  "mcpServers": {
+    "foundational-mcp": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "backend-foundational-mcp-server-1",
+        "python",
+        "main.py"
+      ]
+    }
+  }
+}
+```
+
 After saving the file, restart the Claude Desktop application. The new tools will appear as available integrations.
 
 ---
 
 ## 🎯 Example Prompts to Try
 
-Once connected, try asking your AI assistant:
-- *"What minimalist chairs do we have in the catalog?"*
-- *"Can you add the pink chair to a new cart and generate a checkout link for me?"*
-- *"Look up the customer profile for test@example.com."*
+Once connected, your AI assistant essentially has the keys to your e-commerce storefront. Try asking it to perform multi-step agentic workflows:
+
+**Catalog & Discovery:**
+- *"What minimalist chairs do we have in the catalog? Give me their specific dimensions and prices."*
+- *"Can you search for any products matching the keyword 'pink'?"*
+
+**Cart & Checkout Flow:**
+- *"I'd like to buy the pink chair. Can you initialize a new cart, add it, set the shipping method to standard delivery, and generate a secure Stripe checkout link for me?"*
+- *"What is the current subtotal and grand total of my active cart?"*
+
+**Customer Management:**
+- *"Look up the customer profile for test@example.com and tell me if they have any past orders."*
+- *"Update the shipping address on my active cart to 123 Alexanderplatz, Berlin, 10178, DE."*
