@@ -91,7 +91,6 @@ Once Docker finishes booting, the services will be available locally at:
 ## 📚 Global Resources
 Resources that apply across the entire project:
 - **[Development Skills](./skills)**: Domain-specific resources for AI agents.
-- **[Global Configuration](./config)**: Configuration files.
 
 ---
 *Composable Agentic Commerce - Established 2026*
