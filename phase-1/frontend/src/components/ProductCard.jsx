@@ -3,7 +3,25 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import './ProductCard.css';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, isSkeleton = false, index = 0 }) => {
+  if (isSkeleton) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: (index % 12) * 0.05 }}
+        className="product-card"
+      >
+        <div className="product-image-container skeleton"></div>
+        <div className="product-info">
+          <div className="skeleton skeleton-text skeleton-category"></div>
+          <div className="skeleton skeleton-text skeleton-title"></div>
+          <div className="skeleton skeleton-text skeleton-price"></div>
+        </div>
+      </motion.div>
+    );
+  }
+
   const price = product.masterVariant?.prices?.[0]?.value || 
                 product.masterData?.current?.masterVariant?.prices?.[0]?.value;
   
@@ -24,6 +42,11 @@ const ProductCard = ({ product }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ 
+        duration: 0.5, 
+        delay: (index % 12) * 0.1,
+        ease: [0.4, 0, 0.2, 1]
+      }}
       whileHover={{ y: -10 }}
       className="product-card"
     >

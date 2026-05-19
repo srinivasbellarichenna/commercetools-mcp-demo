@@ -6,7 +6,11 @@ export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { user } = useContext(AuthContext);
+
+  const openDrawer = () => setIsDrawerOpen(true);
+  const closeDrawer = () => setIsDrawerOpen(false);
 
   const refreshCart = async () => {
     try {
@@ -92,6 +96,7 @@ export const CartProvider = ({ children }) => {
       if (!res.ok) throw new Error(`Add to cart failed: ${res.status}`);
       const updatedCart = await res.json();
       setCart(updatedCart);
+      openDrawer(); // Automatically show the feedback after adding
     } catch (e) {
       console.error("Add to cart failed", e);
     }
@@ -115,7 +120,16 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   return (
-    <CartContext.Provider value={{ cart, refreshCart, addToCart, removeFromCart, assignUserToCart }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      refreshCart, 
+      addToCart, 
+      removeFromCart, 
+      assignUserToCart,
+      isDrawerOpen,
+      openDrawer,
+      closeDrawer
+    }}>
       {children}
     </CartContext.Provider>
   );
