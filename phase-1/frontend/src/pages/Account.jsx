@@ -104,7 +104,7 @@ const Account = () => {
             Welcome, {user.firstName || user.email}
           </h1>
         </motion.div>
-        <button className="btn-outline" onClick={() => { logout(); navigate('/'); }}>Sign Out</button>
+        <button className="btn-outline" onClick={() => logout()}>Sign Out</button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 1.5fr', gap: '6rem' }}>

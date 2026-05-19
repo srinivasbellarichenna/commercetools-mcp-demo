@@ -26,7 +26,9 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('cartId'); // Clear cart session so next user gets a fresh cart
     console.log("Customer session terminated.");
+    window.location.href = '/';
   };
 
   const refreshUser = async () => {
