@@ -23,7 +23,13 @@ The Foundation Layer is divided into three primary domains. For an in-depth unde
 
 ### 📸 Visual Proof
 
-[![Watch Ecommerce Demo](https://img.youtube.com/vi/I9nLHVyY9bQ/maxresdefault.jpg?v=2)](https://youtu.be/I9nLHVyY9bQ)
+<div align="center">
+  <a href="https://youtu.be/I9nLHVyY9bQ">
+    <img src="https://img.shields.io/badge/▶_Click_to_Watch_Demo_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Video" />
+    <br/><br/>
+    <img src="https://img.youtube.com/vi/I9nLHVyY9bQ/maxresdefault.jpg?v=2" alt="Ecommerce Demo Video" style="max-width:100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" />
+  </a>
+</div>
 
 ### 1. [Backend Microservices](./phase-1/backend)
 The core logic layer, built with Java and Spring Boot.
