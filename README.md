@@ -43,8 +43,8 @@ This project exposes its e-commerce capabilities via the Model Context Protocol 
 - **Gemini CLI**: Register the server globally using the `gemini mcp add` command to give Gemini full interactive access to your storefront from the terminal.
 - **Claude Desktop**: Configure your `claude_desktop_config.json` to attach the foundational MCP server, granting the Claude Desktop app native e-commerce capabilities.
 
-For step-by-step instructions on wiring these up with your Commercetools credentials, please read our detailed setup guide:
-- 🤖 **[Commercetools MCP Setup Guide](./phase-1/docs/COMMERCETOOLS_MCP_SETUP.md)**
+For step-by-step instructions on wiring these up, please read our detailed setup guide:
+- 🤖 **[Foundational MCP Setup Guide](./phase-1/docs/MCP_CLIENT_SETUP.md)**
 
 ---
 
