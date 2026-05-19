@@ -24,8 +24,11 @@ Before connecting your AI client, you must ensure the foundational MCP server is
 
 ## 🤖 1. Gemini CLI Integration
 
-To register this MCP server globally with the Gemini CLI, open a terminal and run the following command. 
+To register this MCP server globally with the Gemini CLI, open a terminal and choose one of the following methods depending on how you are running the server.
 
+### Option A: Connecting to the Local Python Environment
+
+Use this if you manually installed the Python virtual environment.
 > **Important**: Replace `/ABSOLUTE/PATH/TO/...` with the actual path to your repository clone!
 
 ```bash
@@ -33,6 +36,14 @@ gemini mcp add foundational-mcp \
   /ABSOLUTE/PATH/TO/commercetools-mcp-demo/phase-1/foundational-mcp-server/venv/bin/python \
   -- /ABSOLUTE/PATH/TO/commercetools-mcp-demo/phase-1/foundational-mcp-server/main.py \
   -e API_BASE_URL="http://localhost:8085/api"
+```
+
+### Option B: Connecting to the Docker Container (Recommended)
+
+If you have spun up the entire foundation layer using `docker compose up -d`, you can attach Gemini directly to the running container without needing to configure Python on your host machine!
+
+```bash
+gemini mcp add foundational-mcp docker -- exec -i backend-foundational-mcp-server-1 python main.py
 ```
 
 Once registered, Gemini will now have access to tools like `search_products`, `initialize_cart`, and `create_stripe_checkout`.
