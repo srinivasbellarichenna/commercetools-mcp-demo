@@ -21,14 +21,21 @@ const Auth = () => {
     e.preventDefault();
     setError('');
     const endpoint = isLogin ? `${API_BASE_URL}/customers/login` : `${API_BASE_URL}/customers/register`;
-    let url = endpoint + `?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+    
+    const payload = { email, password };
     if (!isLogin) {
-      if (firstName) url += `&firstName=${encodeURIComponent(firstName)}`;
-      if (lastName) url += `&lastName=${encodeURIComponent(lastName)}`;
+      if (firstName) payload.firstName = firstName;
+      if (lastName) payload.lastName = lastName;
     }
 
     try {
-      const res = await fetch(url, { method: 'POST' });
+      const res = await fetch(endpoint, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
       if (res.ok) {
         const data = await res.json();
         const user = data.customer;

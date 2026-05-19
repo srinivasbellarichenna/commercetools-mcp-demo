@@ -318,7 +318,15 @@ const Checkout = () => {
             >
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', marginBottom: '2.5rem', color: 'var(--bg-secondary)', fontWeight: 500 }}>Select Delivery Method</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {shippingMethods.map(method => (
+                {shippingMethods.map(method => {
+                  const rate = method.zoneRates?.[0]?.shippingRates?.[0];
+                  const price = rate?.price?.centAmount / 100;
+                  const currency = rate?.price?.currencyCode;
+                  const freeAbove = rate?.freeAbove?.centAmount / 100;
+                  const cartSubtotal = cart.totalPrice.centAmount / 100;
+                  const isFree = freeAbove && cartSubtotal >= freeAbove;
+
+                  return (
                   <div 
                     key={method.id}
                     onClick={() => setFormData(prev => ({ ...prev, shippingMethodId: method.id }))}
@@ -337,13 +345,23 @@ const Checkout = () => {
                   >
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--bg-secondary)', marginBottom: '0.25rem' }}>{method.name.en || method.name}</div>
-                      <div style={{ fontSize: '0.9rem', color: 'var(--accent-primary)', opacity: 0.7 }}>{method.description?.en || 'Standard artisanal delivery'}</div>
+                      <div style={{ fontSize: '0.9rem', color: 'var(--accent-primary)', opacity: 0.7 }}>
+                        {method.description?.en || 'Standard artisanal delivery'}
+                        {freeAbove && !isFree && ` (Free over ${freeAbove} ${currency})`}
+                      </div>
                     </div>
                     <div style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--bg-secondary)' }}>
-                      {method.zoneRates?.[0]?.shippingRates?.[0]?.price?.centAmount / 100} {method.zoneRates?.[0]?.shippingRates?.[0]?.price?.currencyCode}
+                      {isFree ? (
+                        <span style={{ color: '#2c3e2d' }}>
+                          <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '0.5rem', fontSize: '0.9rem' }}>{price} {currency}</span>
+                          FREE
+                        </span>
+                      ) : (
+                        `${price} ${currency}`
+                      )}
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
               <div style={{ display: 'flex', gap: '1.5rem', marginTop: '4rem' }}>
                 <button className="btn-outline" style={{ flex: 1, padding: '1.2rem' }} onClick={() => setStep(2)}>Back</button>
