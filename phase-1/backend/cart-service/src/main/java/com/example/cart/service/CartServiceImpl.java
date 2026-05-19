@@ -8,6 +8,7 @@ import com.commercetools.api.models.common.Address;
 import com.commercetools.api.models.shipping_method.ShippingMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -18,25 +19,25 @@ public class CartServiceImpl implements CartService {
     private final ProjectApiRoot apiRoot;
 
     @Override
-    public Cart getCartById(String cartId) {
-        return apiRoot.carts().withId(cartId).get().executeBlocking().getBody();
+    public Mono<Cart> getCartById(String cartId) {
+        return Mono.fromFuture(() -> apiRoot.carts().withId(cartId).get().execute().thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody));
     }
 
     @Override
-    public Cart createCart(String currencyCode, String country) {
-        return apiRoot.carts()
+    public Mono<Cart> createCart(String currencyCode, String country) {
+        return Mono.fromFuture(() -> apiRoot.carts()
                 .post(CartDraftBuilder.of()
                         .currency(currencyCode)
                         .country(country)
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody));
     }
 
     @Override
-    public Cart addLineItemToCart(String cartId, String sku, Long quantity) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> addLineItemToCart(String cartId, String sku, Long quantity) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
@@ -44,102 +45,108 @@ public class CartServiceImpl implements CartService {
                                 .sku(sku)
                                 .quantity(quantity))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 
     @Override
-    public Cart setShippingAddress(String cartId, Address address) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> setShippingAddress(String cartId, Address address) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
                         .plusActions(actionBuilder -> actionBuilder.setShippingAddressBuilder()
                                 .address(address))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 
     @Override
-    public Cart setBillingAddress(String cartId, Address address) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> setBillingAddress(String cartId, Address address) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
                         .plusActions(actionBuilder -> actionBuilder.setBillingAddressBuilder()
                                 .address(address))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 
     @Override
-    public Cart setShippingMethod(String cartId, String shippingMethodId) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> setShippingMethod(String cartId, String shippingMethodId) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
                         .plusActions(actionBuilder -> actionBuilder.setShippingMethodBuilder()
                                 .shippingMethod(shippingMethodBuilder -> shippingMethodBuilder.id(shippingMethodId)))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 
     @Override
-    public List<ShippingMethod> getShippingMethods(String cartId) {
-        return apiRoot.shippingMethods()
+    public Mono<List<ShippingMethod>> getShippingMethods(String cartId) {
+        return Mono.fromFuture(() -> apiRoot.shippingMethods()
                 .matchingCart()
                 .get()
                 .withCartId(cartId)
-                .executeBlocking()
-                .getBody()
-                .getResults();
+                .execute()
+                .thenApply(resp -> resp.getBody().getResults()));
     }
 
     @Override
-    public Cart setCustomerId(String cartId, String customerId) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> setCustomerId(String cartId, String customerId) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
                         .plusActions(actionBuilder -> actionBuilder.setCustomerIdBuilder()
                                 .customerId(customerId))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 
     @Override
-    public Cart removeLineItem(String cartId, String lineItemId) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> removeLineItem(String cartId, String lineItemId) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
                         .plusActions(actionBuilder -> actionBuilder.removeLineItemBuilder()
                                 .lineItemId(lineItemId))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 
     @Override
-    public Cart addPayment(String cartId, String paymentId) {
-        Cart cart = getCartById(cartId);
-        return apiRoot.carts()
+    public Mono<Cart> addPayment(String cartId, String paymentId) {
+        return getCartById(cartId).flatMap(cart -> 
+            Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
                         .version(cart.getVersion())
                         .plusActions(actionBuilder -> actionBuilder.addPaymentBuilder()
                                 .payment(paymentBuilder -> paymentBuilder.id(paymentId)))
                         .build())
-                .executeBlocking()
-                .getBody();
+                .execute()
+                .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+        );
     }
 }

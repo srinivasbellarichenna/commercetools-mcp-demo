@@ -6,7 +6,6 @@ import com.example.customer.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,6 +15,7 @@ import com.example.customer.dto.CustomerRegisterRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -26,116 +26,94 @@ public class CustomerController {
 
     @Operation(summary = "Register a new Customer")
     @PostMapping("/register")
-    public ResponseEntity<CustomerSignInResult> registerCustomer(
+    public Mono<ResponseEntity<CustomerSignInResult>> registerCustomer(
             @Valid @RequestBody CustomerRegisterRequestDTO request) {
-        return ResponseEntity.ok(customerService.registerCustomer(
-                request.getEmail(), request.getPassword(), request.getFirstName(), request.getLastName()));
+        return customerService.registerCustomer(
+                request.getEmail(), request.getPassword(), request.getFirstName(), request.getLastName())
+                .map(ResponseEntity::ok);
     }
 
     @Operation(summary = "Login an existing Customer")
     @PostMapping("/login")
-    public ResponseEntity<CustomerSignInResult> loginCustomer(
+    public Mono<ResponseEntity<CustomerSignInResult>> loginCustomer(
             @Valid @RequestBody CustomerLoginRequestDTO request) {
-        return ResponseEntity.ok(customerService.loginCustomer(request.getEmail(), request.getPassword()));
+        return customerService.loginCustomer(request.getEmail(), request.getPassword())
+                .map(ResponseEntity::ok);
     }
 
     @Operation(summary = "Get Customer Profile")
     @GetMapping("/{customerId}")
-    public ResponseEntity<Object> getCustomerById(
-            @Parameter(description = "The unique identifier of the customer") @PathVariable String customerId) {
-        Customer customer = customerService.getCustomerById(customerId);
-        return ResponseEntity.ok(convertToMap(customer));
+    public Mono<ResponseEntity<Customer>> getCustomerProfile(
+            @PathVariable String customerId) {
+        return customerService.getCustomerById(customerId)
+                .map(ResponseEntity::ok);
     }
 
-    @Operation(summary = "Search Customer by Email")
-    @GetMapping("/search")
-    public ResponseEntity<Object> getCustomerByEmail(
-            @Parameter(description = "The email address of the customer") @RequestParam String email) {
-        Customer customer = customerService.getCustomerByEmail(email);
-        return ResponseEntity.ok(convertToMap(customer));
+    @Operation(summary = "Get Customer by Email")
+    @GetMapping("/email")
+    public Mono<ResponseEntity<Customer>> getCustomerByEmail(
+            @RequestParam String email) {
+        return customerService.getCustomerByEmail(email)
+                .map(customer -> {
+                    if (customer == null) {
+                        return ResponseEntity.notFound().build();
+                    }
+                    return ResponseEntity.ok(customer);
+                });
     }
 
-    private Map<String, Object> convertToMap(Customer customer) {
-        if (customer == null) return null;
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", customer.getId());
-        map.put("email", customer.getEmail());
-        map.put("firstName", customer.getFirstName());
-        map.put("lastName", customer.getLastName());
-        map.put("version", customer.getVersion());
-        map.put("defaultShippingAddressId", customer.getDefaultShippingAddressId());
-        map.put("defaultBillingAddressId", customer.getDefaultBillingAddressId());
-        
-        if (customer.getAddresses() != null) {
-            List<Map<String, Object>> addressMaps = customer.getAddresses().stream()
-                    .map(this::addressToMap)
-                    .collect(Collectors.toList());
-            map.put("addresses", addressMaps);
-        }
-        
-        return map;
+    @Operation(summary = "Update Customer Profile")
+    @PatchMapping("/{customerId}")
+    public Mono<ResponseEntity<Customer>> updateProfile(
+            @PathVariable String customerId,
+            @RequestBody Map<String, String> updates) {
+        return customerService.updateProfile(
+                customerId,
+                updates.get("email"),
+                updates.get("firstName"),
+                updates.get("lastName"))
+                .map(ResponseEntity::ok);
     }
 
-    private Map<String, Object> addressToMap(com.commercetools.api.models.common.Address address) {
-        if (address == null) return null;
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", address.getId());
-        map.put("firstName", address.getFirstName());
-        map.put("lastName", address.getLastName());
-        map.put("streetName", address.getStreetName());
-        map.put("streetNumber", address.getStreetNumber());
-        map.put("postalCode", address.getPostalCode());
-        map.put("city", address.getCity());
-        map.put("region", address.getRegion());
-        map.put("state", address.getState());
-        map.put("country", address.getCountry());
-        map.put("company", address.getCompany());
-        map.put("department", address.getDepartment());
-        map.put("building", address.getBuilding());
-        map.put("apartment", address.getApartment());
-        map.put("phone", address.getPhone());
-        map.put("mobile", address.getMobile());
-        map.put("email", address.getEmail());
-        return map;
+    @Operation(summary = "Get Customer Addresses")
+    @GetMapping("/{customerId}/addresses")
+    public Mono<ResponseEntity<List<com.commercetools.api.models.common.Address>>> getAddresses(
+            @PathVariable String customerId) {
+        return customerService.getCustomerById(customerId)
+                .map(Customer::getAddresses)
+                .map(ResponseEntity::ok);
     }
 
     @Operation(summary = "Add Address to Customer Profile")
     @PostMapping("/{customerId}/addresses")
-    public ResponseEntity<Customer> addAddress(
+    public Mono<ResponseEntity<Customer>> addAddress(
             @PathVariable String customerId,
             @Valid @RequestBody AddressRequestDTO addressDto) {
-        return ResponseEntity.ok(customerService.addAddress(customerId, mapToAddress(addressDto)));
+        return customerService.addAddress(customerId, mapToAddress(addressDto))
+                .map(ResponseEntity::ok);
     }
 
     @Operation(summary = "Remove Address from Customer Profile")
     @DeleteMapping("/{customerId}/addresses/{addressId}")
-    public ResponseEntity<Customer> removeAddress(
+    public Mono<ResponseEntity<Customer>> removeAddress(
             @PathVariable String customerId,
             @PathVariable String addressId) {
-        return ResponseEntity.ok(customerService.removeAddress(customerId, addressId));
-    }
-
-    @Operation(summary = "Update Customer Profile")
-    @PatchMapping("/{customerId}/profile")
-    public ResponseEntity<Customer> updateProfile(
-            @PathVariable String customerId,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName) {
-        return ResponseEntity.ok(customerService.updateProfile(customerId, email, firstName, lastName));
+        return customerService.removeAddress(customerId, addressId)
+                .map(ResponseEntity::ok);
     }
 
     @Operation(summary = "Update Address in Customer Profile")
     @PatchMapping("/{customerId}/addresses/{addressId}")
-    public ResponseEntity<Customer> changeAddress(
+    public Mono<ResponseEntity<Customer>> changeAddress(
             @PathVariable String customerId,
             @PathVariable String addressId,
             @Valid @RequestBody AddressRequestDTO addressDto) {
-        return ResponseEntity.ok(customerService.changeAddress(customerId, addressId, mapToAddress(addressDto)));
+        return customerService.changeAddress(customerId, addressId, mapToAddress(addressDto))
+                .map(ResponseEntity::ok);
     }
 
-    private com.commercetools.api.models.common.BaseAddress mapToAddress(AddressRequestDTO dto) {
-        return com.commercetools.api.models.common.BaseAddress.builder()
+    private com.commercetools.api.models.common.Address mapToAddress(AddressRequestDTO dto) {
+        return com.commercetools.api.models.common.Address.builder()
                 .country(dto.getCountry())
                 .id(dto.getId())
                 .key(dto.getKey())
@@ -165,18 +143,47 @@ public class CustomerController {
     }
 
     @Operation(summary = "Add Payment Method to Customer Profile")
-    @PostMapping("/{customerId}/payments")
-    public ResponseEntity<Customer> addPaymentMethod(
+    @PostMapping("/{customerId}/payment-methods")
+    public Mono<ResponseEntity<Customer>> addPaymentMethod(
             @PathVariable String customerId,
-            @RequestParam String paymentToken,
-            @RequestParam String last4,
-            @RequestParam String brand) {
-        return ResponseEntity.ok(customerService.addPaymentMethod(customerId, paymentToken, last4, brand));
+            @RequestBody Map<String, String> payload) {
+        return customerService.addPaymentMethod(
+                customerId, 
+                payload.get("paymentToken"), 
+                payload.get("last4"), 
+                payload.get("brand"))
+                .map(ResponseEntity::ok);
+    }
+
+    @Operation(summary = "Get Saved Payment Methods")
+    @GetMapping("/{customerId}/payment-methods")
+    public Mono<ResponseEntity<List<Map<String, String>>>> getPaymentMethods(
+            @PathVariable String customerId) {
+        return customerService.getCustomerById(customerId)
+                .map(customer -> {
+                    if (customer.getCustom() == null || customer.getCustom().getFields() == null) {
+                        return ResponseEntity.ok(List.of());
+                    }
+                    Object savedMethodsObj = customer.getCustom().getFields().values().get("savedPaymentMethods");
+                    if (savedMethodsObj == null) {
+                        return ResponseEntity.ok(List.of());
+                    }
+                    
+                    try {
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        String jsonString = savedMethodsObj.toString();
+                        // This is a naive implementation, usually you'd store an array of objects
+                        Map<String, String> paymentMap = mapper.readValue(jsonString, Map.class);
+                        return ResponseEntity.ok(List.of(paymentMap));
+                    } catch (Exception e) {
+                        return ResponseEntity.ok(List.of());
+                    }
+                });
     }
 
     @Operation(summary = "Get all Customers")
     @GetMapping
-    public ResponseEntity<com.commercetools.api.models.customer.CustomerPagedQueryResponse> getCustomers() {
-        return ResponseEntity.ok(customerService.getCustomers());
+    public Mono<ResponseEntity<com.commercetools.api.models.customer.CustomerPagedQueryResponse>> getCustomers() {
+        return customerService.getCustomers().map(ResponseEntity::ok);
     }
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class PaymentController {
 
     @Operation(summary = "Create a Stripe Checkout Session")
     @PostMapping("/checkout")
-    public ResponseEntity<Map<String, String>> createCheckoutSession(
+    public Mono<ResponseEntity<Map<String, String>>> createCheckoutSession(
             @Parameter(description = "ID of the Commercetools Cart") @RequestParam String cartId,
             @Parameter(description = "Success redirect URL") @RequestParam(required = false) String successUrl,
             @Parameter(description = "Cancel redirect URL") @RequestParam(required = false) String cancelUrl) {
@@ -30,24 +31,24 @@ public class PaymentController {
         String effectiveSuccessUrl = (successUrl != null && !successUrl.isEmpty()) ? successUrl : frontendUrl + "/checkout/success";
         String effectiveCancelUrl = (cancelUrl != null && !cancelUrl.isEmpty()) ? cancelUrl : frontendUrl + "/cart";
             
-        String checkoutUrl = paymentService.createCheckoutSession(cartId, effectiveSuccessUrl, effectiveCancelUrl);
-        return ResponseEntity.ok(Map.of("url", checkoutUrl));
+        return paymentService.createCheckoutSession(cartId, effectiveSuccessUrl, effectiveCancelUrl)
+                .map(url -> ResponseEntity.ok(Map.of("url", url)));
     }
 
     @Operation(summary = "Get Stripe Session Details")
     @GetMapping("/session/{sessionId}")
-    public ResponseEntity<com.stripe.model.checkout.Session> getSessionDetails(
+    public Mono<ResponseEntity<com.stripe.model.checkout.Session>> getSessionDetails(
             @PathVariable String sessionId) {
-        return ResponseEntity.ok(paymentService.getSessionDetails(sessionId));
+        return paymentService.getSessionDetails(sessionId).map(ResponseEntity::ok);
     }
 
     @Operation(summary = "Create Commercetools Payment")
     @PostMapping
-    public ResponseEntity<com.commercetools.api.models.payment.Payment> createPayment(
+    public Mono<ResponseEntity<com.commercetools.api.models.payment.Payment>> createPayment(
             @RequestParam String cartId,
             @RequestParam String amount,
             @RequestParam String currency,
             @RequestParam String paymentMethod) {
-        return ResponseEntity.ok(paymentService.createPayment(cartId, amount, currency, paymentMethod));
+        return paymentService.createPayment(cartId, amount, currency, paymentMethod).map(ResponseEntity::ok);
     }
 }
