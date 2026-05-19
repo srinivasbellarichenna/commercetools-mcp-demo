@@ -294,7 +294,7 @@ async def get_customer_by_email(email: str) -> str:
     logger.info(f"Tool Call: get_customer_by_email(email='{email}')")
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            url = f"{API_BASE_URL}/customers/search"
+            url = f"{API_BASE_URL}/customers/email"
             params = {"email": email}
             logger.info(f"Backend Request: GET {url} params={params}")
             
@@ -467,15 +467,15 @@ async def update_customer_profile(customer_id: str, first_name: str = "", last_n
     logger.info(f"Tool Call: update_customer_profile(customer_id='{customer_id}', first_name='{first_name}', last_name='{last_name}', email='{email}')")
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            params = {}
-            if first_name: params["firstName"] = first_name
-            if last_name: params["lastName"] = last_name
-            if email: params["email"] = email
+            payload = {}
+            if first_name: payload["firstName"] = first_name
+            if last_name: payload["lastName"] = last_name
+            if email: payload["email"] = email
             
-            url = f"{API_BASE_URL}/customers/{customer_id}/profile"
-            logger.info(f"Backend Request: PATCH {url} params={params}")
+            url = f"{API_BASE_URL}/customers/{customer_id}"
+            logger.info(f"Backend Request: PATCH {url} json={payload}")
             
-            response = await client.patch(url, params=params)
+            response = await client.patch(url, json=payload)
             logger.info(f"Backend Response: Status={response.status_code}")
             
             response.raise_for_status()
