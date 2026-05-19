@@ -22,10 +22,8 @@ This repository branch contains the **Foundation Layer** (Phase 1) of the archit
 The Foundation Layer is divided into three primary domains. For an in-depth understanding of how each component is built and architected, refer to their specific documentations:
 
 ### 📸 Visual Proof
-*(Replace these placeholders with actual screenshots before publishing)*
 <div align="center">
-  <img src="./assets/storefront.png" alt="React Storefront" width="45%" />
-  <img src="./assets/claude-demo.png" alt="Claude MCP Action" width="45%" />
+  <video src="./phase-1/docs/assets/ecom_demo_video.mov" width="100%" controls></video>
 </div>
 
 ### 1. [Backend Microservices](./phase-1/backend)
