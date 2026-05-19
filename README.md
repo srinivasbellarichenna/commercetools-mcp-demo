@@ -1,5 +1,7 @@
 # Composable Agentic Commerce - Commercetools MCP Demo
 
+[![CI Build](https://github.com/srinivasbellarichenna/commercetools-mcp-demo/actions/workflows/build.yml/badge.svg)](https://github.com/srinivasbellarichenna/commercetools-mcp-demo/actions/workflows/build.yml)
+
 Welcome to **Composable Agentic Commerce**, a demonstration of Commercetools microservices integrated with autonomous AI agents via the Model Context Protocol (MCP).
 
 This repository branch contains the **Foundation Layer** (Phase 1) of the architecture, which establishes the robust, scalable, and secure infrastructure necessary to run modern e-commerce operations. It serves as the bedrock upon which the advanced AI orchestration (Phase 2) is built.
@@ -18,6 +20,13 @@ This repository branch contains the **Foundation Layer** (Phase 1) of the archit
 ## 🏛️ System Architecture & Deep Dives
 
 The Foundation Layer is divided into three primary domains. For an in-depth understanding of how each component is built and architected, refer to their specific documentations:
+
+### 📸 Visual Proof
+*(Replace these placeholders with actual screenshots before publishing)*
+<div align="center">
+  <img src="./assets/storefront.png" alt="React Storefront" width="45%" />
+  <img src="./assets/claude-demo.png" alt="Claude MCP Action" width="45%" />
+</div>
 
 ### 1. [Backend Microservices](./phase-1/backend)
 The core logic layer, built with Java and Spring Boot.
@@ -91,6 +100,13 @@ Once Docker finishes booting, the services will be available locally at:
 ## 📚 Global Resources
 Resources that apply across the entire project:
 - **[Development Skills](./skills)**: Domain-specific resources for AI agents.
+
+## 🚀 What's Next? (Phase 2 Teaser)
+The **Foundation Layer** you see here is just the beginning. 
+
+In **Phase 2**, we will be introducing **Federated Agent Swarms** (powered by LangGraph). Instead of a single LLM trying to do everything, you will see a network of specialized agents—a Product Specialist, a Returns Manager, and a Checkout Coordinator—collaborating autonomously to serve the customer. 
+
+Star and Watch the repository to stay updated on the Phase 2 launch!
 
 ---
 *Composable Agentic Commerce - Established 2026*
