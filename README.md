@@ -66,7 +66,7 @@ Before attempting to run this project, ensure you have the following third-party
 
 **Commercetools Setup:**
 1. Sign up for a [Commercetools 60-day free trial](https://commercetools.com/free-trial). *(Note: You can use a personal email address like `@gmail.com` in the "Business Email" field if you don't have a corporate one).*
-2. Create a Commercetools project and import the demo data.
+2. Create a Commercetools project. **Crucially**, during the project creation flow, ensure you opt-in to load the sample demo data offered by Commercetools.
 3. Ensure you have an **API Client** created with appropriate scopes (or Admin) to obtain your credentials.
 4. In the Merchant Center, ensure products are **indexed** and that **Product Search** is fully activated so the backend can execute catalog queries.
 
