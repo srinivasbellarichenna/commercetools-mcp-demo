@@ -23,7 +23,7 @@ The Foundation Layer is divided into three primary domains. For an in-depth unde
 
 ### 📸 Visual Proof
 
-[![Watch Ecommerce Demo](https://img.youtube.com/vi/WPlj-tjl8cc/maxresdefault.jpg)](https://youtu.be/WPlj-tjl8cc)
+[![Watch Ecommerce Demo](https://img.youtube.com/vi/I9nLHVyY9bQ/maxresdefault.jpg)](https://youtu.be/I9nLHVyY9bQ)
 
 ### 1. [Backend Microservices](./phase-1/backend)
 The core logic layer, built with Java and Spring Boot.
