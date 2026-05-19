@@ -52,6 +52,18 @@ For step-by-step instructions on wiring these up, please read our detailed setup
 
 Follow these steps to spin up the entire foundation layer locally.
 
+### 0. Prerequisites
+Before attempting to run this project, ensure you have the following third-party services configured:
+
+**Commercetools Setup:**
+1. Create a Commercetools project and import demo data.
+2. Ensure you have an **API Client** created with appropriate scopes (or Admin) to obtain your credentials.
+3. In the Merchant Center, ensure products are **indexed** and that **Product Search** is fully activated so the backend can execute catalog queries.
+
+**Stripe Setup:**
+1. Create a Stripe developer account.
+2. Obtain your **Stripe Secret Key** (`STRIPE_SECRET_KEY` starting with `sk_test_...`) to enable secure checkout flow generation.
+
 ### 1. Environment Configuration
 Navigate into the backend directory and set up your environment variables:
 ```bash
