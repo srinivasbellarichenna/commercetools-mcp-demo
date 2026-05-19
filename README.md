@@ -2,27 +2,84 @@
 
 Welcome to **Composable Agentic Commerce**, a demonstration of Commercetools microservices integrated with autonomous AI agents via the Model Context Protocol (MCP).
 
-## 🏛️ Project Architecture
+This repository branch contains the **Foundation Layer** (Phase 1) of the architecture, which establishes the robust, scalable, and secure infrastructure necessary to run modern e-commerce operations. It serves as the bedrock upon which the advanced AI orchestration (Phase 2) is built.
 
-This repository branch contains the **Foundation Layer** (Phase 1) of the architecture. The Phase 2 enhancements (advanced agent orchestration) are currently under development.
+---
 
-### 🌟 [Phase 1: Foundation Layer](./phase-1/README.md)
-The core infrastructure necessary to run the e-commerce operations. This includes the microservices backend, frontend storefront, and the foundational MCP server.
+## 🎯 Phase 1: Key Capabilities
 
-**Detailed Phase 1 Documentation:**
-- **Backend Microservices**: [README](./phase-1/backend/README.md) | [Architectural Walkthrough](./phase-1/backend/walkthrough.md)
-- **Frontend Application**: [README](./phase-1/frontend/README.md) | [Architectural Walkthrough](./phase-1/frontend/walkthrough.md)
-- **Foundational MCP Server**: [README](./phase-1/foundational-mcp-server/README.md) | [Architectural Walkthrough](./phase-1/foundational-mcp-server/walkthrough.md)
+- **Headless Commerce Engine**: Full integration with Commercetools APIs for catalog discovery, cart management, and order finalization.
+- **Microservice Architecture**: Decoupled Java Spring Boot microservices behind a unified API Gateway.
+- **Secure Payment Processing**: Seamless Stripe Checkout integration that keeps sensitive PCI-compliant data completely out of the AI's scope.
+- **Model Context Protocol (MCP)**: A foundational Python FastMCP server that exposes deterministic e-commerce actions (tools) directly to AI models like Claude or Gemini.
 
-### 📚 Global Resources
+---
+
+## 🏛️ System Architecture & Deep Dives
+
+The Foundation Layer is divided into three primary domains. For an in-depth understanding of how each component is built and architected, refer to their specific documentations:
+
+### 1. [Backend Microservices](./phase-1/backend)
+The core logic layer, built with Java and Spring Boot.
+- 📖 **[Backend README](./phase-1/backend/README.md)**
+- 🧠 **[Architectural Walkthrough](./phase-1/backend/walkthrough.md)**
+
+### 2. [Frontend Storefront](./phase-1/frontend)
+The customer-facing React application, built with Vite and styled with Vanilla CSS.
+- 📖 **[Frontend README](./phase-1/frontend/README.md)**
+- 🧠 **[Architectural Walkthrough](./phase-1/frontend/walkthrough.md)**
+
+### 3. [Foundational MCP Server](./phase-1/foundational-mcp-server)
+The Python server bridging the AI interfaces and the Java backend APIs.
+- 📖 **[MCP Server README](./phase-1/foundational-mcp-server/README.md)**
+- 🧠 **[Architectural Walkthrough](./phase-1/foundational-mcp-server/walkthrough.md)**
+
+---
+
+## 📚 AI Client Integration (MCP)
+
+This project exposes its e-commerce capabilities via the Model Context Protocol (MCP). You can connect our foundational server directly to popular AI assistants, allowing them to act as autonomous shopping agents on your behalf.
+
+- **Gemini CLI**: Register the server globally using the `gemini mcp add` command to give Gemini full interactive access to your storefront from the terminal.
+- **Claude Desktop**: Configure your `claude_desktop_config.json` to attach the foundational MCP server, granting the Claude Desktop app native e-commerce capabilities.
+
+For step-by-step instructions on wiring these up with your Commercetools credentials, please read our detailed setup guide:
+- 🤖 **[Commercetools MCP Setup Guide](./phase-1/docs/COMMERCETOOLS_MCP_SETUP.md)**
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to spin up the entire foundation layer locally.
+
+### 1. Environment Configuration
+Navigate into the backend directory and set up your environment variables:
+```bash
+cd phase-1/backend
+cp .env.example .env
+```
+Open the newly created `.env` file and securely input your Commercetools API and Stripe credentials.
+
+### 2. Compile and Start Services
+First, compile the Java microservices. Then, use Docker Compose to containerize and spin up the Backend Microservices, Frontend React App, and the Foundational MCP Server all at once.
+```bash
+# Ensure you are inside the 'phase-1/backend' directory
+mvn clean package -DskipTests
+docker compose up -d --build
+```
+
+### 3. Verify Deployment
+Once Docker finishes booting, the services will be available locally at:
+- 🛒 **Frontend Storefront**: `http://localhost:3001`
+- 🌐 **API Gateway (Backend)**: `http://localhost:8085`
+- 🔌 **MCP Server (SSE Endpoint)**: `http://localhost:8087`
+
+---
+
+## 📚 Global Resources
 Resources that apply across the entire project:
 - **[Development Skills](./skills)**: Domain-specific resources for AI agents.
 - **[Global Configuration](./config)**: Configuration files.
-
-## 🎭 Quick Start
-
-To witness the foundation and foundational MCP server in action, please refer to the Phase 1 documentation:
-- [Phase 1 Getting Started](./phase-1/README.md#getting-started)
 
 ---
 *Composable Agentic Commerce - Established 2026*
