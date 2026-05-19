@@ -34,9 +34,14 @@ The Python server bridging the AI interfaces and the Java backend APIs.
 
 ---
 
-## 📚 MCP Configuration Guides
+## 📚 AI Client Integration (MCP)
 
-To securely connect this foundation layer to your AI agents (like Claude Desktop or Gemini CLI), please read our setup guides:
+This project exposes its e-commerce capabilities via the Model Context Protocol (MCP). You can connect our foundational server directly to popular AI assistants, allowing them to act as autonomous shopping agents on your behalf.
+
+- **Gemini CLI**: Register the server globally using the `gemini mcp add` command to give Gemini full interactive access to your storefront from the terminal.
+- **Claude Desktop**: Configure your `claude_desktop_config.json` to attach the foundational MCP server, granting the Claude Desktop app native e-commerce capabilities.
+
+For step-by-step instructions on wiring these up with your Commercetools credentials, please read our detailed setup guide:
 - 🤖 **[Commercetools MCP Setup Guide](./docs/COMMERCETOOLS_MCP_SETUP.md)**
 
 ---
