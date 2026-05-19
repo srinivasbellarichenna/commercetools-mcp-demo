@@ -22,7 +22,7 @@ This repository branch contains the **Foundation Layer** (Phase 1) of the archit
 The Foundation Layer is divided into three primary domains. For an in-depth understanding of how each component is built and architected, refer to their specific documentations:
 
 ### 📸 Visual Proof
-https://github.com/srinivasbellarichenna/commercetools-mcp-demo/raw/main/phase-1/docs/assets/ecom_demo_video.mp4
+<video src="./phase-1/docs/assets/ecom_demo_video.mp4" controls="controls" muted="muted" playsinline="playsinline"></video>
 
 ### 1. [Backend Microservices](./phase-1/backend)
 The core logic layer, built with Java and Spring Boot.
