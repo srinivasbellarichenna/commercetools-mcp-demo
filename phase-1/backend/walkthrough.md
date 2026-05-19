@@ -23,7 +23,16 @@ When an AI agent (or the frontend) requests a payment via `create_stripe_checkou
 2. It returns this URL so the consumer can securely input credit card details out-of-scope of the AI.
 3. Once completed, a Payment object is persisted in Commercetools and associated with the active Cart.
 
-## 5. Detailed Microservice APIs
+## 5. Architectural Revolution: Blocking to Reactive
+The backend operates on a fully asynchronous, reactive architecture to handle high concurrency efficiently:
+- **Spring WebFlux Transition**: All 5 microservices utilize `spring-boot-starter-webflux` to run on the high-concurrency Netty server.
+- **Non-Blocking SDK Integration**: Bridging Commercetools `CompletableFuture`s into Project Reactor `Mono` streams eliminates idle thread blocking.
+- **Reactive Controllers**: Every endpoint returns `Mono<T>`, drastically increasing system throughput by instantly releasing threads during I/O waits.
+
+## 6. Enterprise-Grade Validation
+To ensure reactive pipelines only process high-quality, sanitized data, we employ **DTO-Driven Validation**. The `CartController` and `CustomerController` utilize `jakarta.validation` on custom request DTOs (like `AddressRequestDTO`) to reject malformed requests (e.g., bad emails or missing country codes) at the API Gateway boundary before they reach the SDK.
+
+## 7. Detailed Microservice APIs
 
 Below is a reference for the domain-specific APIs exposed through the Gateway that the frontend and MCP servers rely on.
 

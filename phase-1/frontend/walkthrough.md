@@ -13,13 +13,19 @@ The `Checkout.jsx` component implements a robust state machine for the checkout 
 - **Validation**: It enforces strict validation blocks, preventing users from advancing if critical information (like city or first name) is missing.
 - **Real-time Updates**: When a shipping method is selected, the frontend instantly commits this to the backend API and refreshes the cart to display the newly calculated grand total (including delivery fees).
 
-## 3. Production Dockerization
+## 3. "Artisan Heritage" Aesthetic Polish
+We implemented a "Premium Boutique" feel using advanced CSS and interaction design:
+- **Skeleton Loading System**: Replaced jarring loading spinners with shimmering skeleton cards. This reduces layout shift and provides immediate visual structure.
+- **Staggered Entrance Animations**: A "cascade" effect using Framer Motion glides products in with incremental delays (100ms), creating an orchestrated feel.
+- **Slide-out Cart Drawer**: A global Reactive Cart Drawer with backdrop blurring and spring-physics animations provides immediate, non-disruptive feedback when items are added.
+
+## 4. Production Dockerization
 The frontend is optimized for production deployment using a **multi-stage Docker build**.
 1. **Build Stage**: It uses a lightweight Node.js image (`node:20-slim`) to install dependencies and run the Vite build process (`npm run build`).
 2. **Serve Stage**: It discards the heavy Node modules and copies only the compiled static assets (`/dist`) into an `nginx:stable-alpine` image.
 This results in a highly secure, incredibly small container footprint that serves the application at lightning speeds.
 
-## 4. Backend API Integration Mapping
+## 5. Backend API Integration Mapping
 
 The frontend communicates with the backend microservices exclusively through the API Gateway. Below is a mapping of key frontend workflows to the backend endpoints they consume:
 
