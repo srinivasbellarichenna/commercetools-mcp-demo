@@ -36,10 +36,11 @@ public class PaymentController {
     }
 
     @Operation(summary = "Get Stripe Session Details")
-    @GetMapping("/session/{sessionId}")
-    public Mono<ResponseEntity<com.stripe.model.checkout.Session>> getSessionDetails(
+    @GetMapping(value = "/session/{sessionId}", produces = "application/json")
+    public Mono<ResponseEntity<String>> getSessionDetails(
             @PathVariable String sessionId) {
-        return paymentService.getSessionDetails(sessionId).map(ResponseEntity::ok);
+        return paymentService.getSessionDetails(sessionId)
+                .map(session -> ResponseEntity.ok(session.toJson()));
     }
 
     @Operation(summary = "Create Commercetools Payment")

@@ -9,9 +9,13 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "*"
+            allowedOrigins:
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+              - "http://localhost:3001"
             allowedMethods: "*"
             allowedHeaders: "*"
+            allowCredentials: true
       routes:
         - id: product-service
           uri: http://product-service:8081

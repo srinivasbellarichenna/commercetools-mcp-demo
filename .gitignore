@@ -42,6 +42,7 @@ docker-compose.override.yml
 _agents/
 _agent/
 brain/
+.antigravitycli/
 
 # Java & Maven
 target/

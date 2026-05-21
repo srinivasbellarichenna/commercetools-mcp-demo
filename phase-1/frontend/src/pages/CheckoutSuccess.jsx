@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useRef } from 'react';
-import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, Package, ArrowRight, ShieldCheck } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
@@ -19,14 +19,36 @@ const CheckoutSuccess = () => {
     const finalizeOrder = async () => {
       const cartId = searchParams.get('cartId');
       const cartVersion = searchParams.get('cartVersion');
+      const sessionId = searchParams.get('sessionId');
       
-      if (cartId && cartVersion && !hasFinalized.current) {
+      if (cartId && !hasFinalized.current) {
         hasFinalized.current = true;
         setLoading(true);
-        console.log("🚀 Finalizing order for Cart:", cartId, "Version:", cartVersion);
+        console.log("🚀 Finalizing order check for Cart:", cartId);
         
         try {
-          const res = await fetch(`${API_BASE_URL}/orders/from-cart?cartId=${cartId}&cartVersion=${cartVersion}`, {
+          // Check if order already exists for this cart (idempotency check)
+          const checkRes = await fetch(`${API_BASE_URL}/orders/cart/${cartId}`);
+          if (checkRes.ok) {
+            const checkData = await checkRes.json();
+            if (checkData.results && checkData.results.length > 0) {
+              setOrderId(checkData.results[0].id);
+              console.log("✨ Order already existed for Cart, retrieved ID:", checkData.results[0].id);
+              localStorage.removeItem('cartId');
+              refreshCart();
+              setLoading(false);
+              return;
+            }
+          }
+
+          if (!cartVersion || !sessionId) {
+            console.error("❌ Cannot finalize: cartVersion or sessionId missing.");
+            setLoading(false);
+            return;
+          }
+
+          console.log("🛒 Creating order from cart with version", cartVersion, "using session", sessionId);
+          const res = await fetch(`${API_BASE_URL}/orders/from-cart?cartId=${cartId}&cartVersion=${cartVersion}&sessionId=${sessionId}`, {
             method: 'POST'
           });
           
@@ -160,7 +182,7 @@ const CheckoutSuccess = () => {
           </Link>
         </div>
 
-        <div style={{ mt: '6rem', pt: '3rem', borderTop: '1px solid rgba(44, 62, 45, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem', opacity: 0.4, letterSpacing: '0.1em' }}>
+        <div style={{ marginTop: '6rem', paddingTop: '3rem', borderTop: '1px solid rgba(44, 62, 45, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem', opacity: 0.4, letterSpacing: '0.1em' }}>
           <ShieldCheck size={14} /> SECURE AGENTIC PLATFORM
         </div>
       </motion.div>

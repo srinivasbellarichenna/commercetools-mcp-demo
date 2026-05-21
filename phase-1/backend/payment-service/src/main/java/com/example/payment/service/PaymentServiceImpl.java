@@ -36,6 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
 
                     SessionCreateParams params = SessionCreateParams.builder()
                             .setMode(SessionCreateParams.Mode.PAYMENT)
+                            .setClientReferenceId(cartId)
                             .setSuccessUrl(successUrl + "?cartId=" + cartId + "&cartVersion=" + cart.getVersion() + "&sessionId={CHECKOUT_SESSION_ID}")
                             .setCancelUrl(cancelUrl)
                             .addLineItem(SessionCreateParams.LineItem.builder()

@@ -34,9 +34,25 @@ public class CartServiceImpl implements CartService {
                 .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody));
     }
 
+    private Mono<Cart> executeUpdateWithRetry(String cartId, java.util.function.Function<Cart, Mono<Cart>> updateFunction) {
+        return Mono.defer(() -> getCartById(cartId)
+                .flatMap(updateFunction)
+                .retryWhen(reactor.util.retry.Retry.max(3)
+                        .filter(throwable -> {
+                            if (throwable instanceof io.vrap.rmf.base.client.error.ConcurrentModificationException) {
+                                return true;
+                            }
+                            if (throwable.getCause() instanceof io.vrap.rmf.base.client.error.ConcurrentModificationException) {
+                                return true;
+                            }
+                            return false;
+                        })
+                ));
+    }
+
     @Override
     public Mono<Cart> addLineItemToCart(String cartId, String sku, Long quantity) {
-        return getCartById(cartId).flatMap(cart -> 
+        return executeUpdateWithRetry(cartId, cart ->
             Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
@@ -52,7 +68,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Cart> setShippingAddress(String cartId, Address address) {
-        return getCartById(cartId).flatMap(cart -> 
+        return executeUpdateWithRetry(cartId, cart ->
             Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
@@ -67,7 +83,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Cart> setBillingAddress(String cartId, Address address) {
-        return getCartById(cartId).flatMap(cart -> 
+        return executeUpdateWithRetry(cartId, cart ->
             Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
@@ -82,7 +98,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Cart> setShippingMethod(String cartId, String shippingMethodId) {
-        return getCartById(cartId).flatMap(cart -> 
+        return executeUpdateWithRetry(cartId, cart ->
             Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
@@ -107,22 +123,59 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Cart> setCustomerId(String cartId, String customerId) {
-        return getCartById(cartId).flatMap(cart -> 
-            Mono.fromFuture(() -> apiRoot.carts()
-                .withId(cartId)
-                .post(CartUpdateBuilder.of()
-                        .version(cart.getVersion())
-                        .plusActions(actionBuilder -> actionBuilder.setCustomerIdBuilder()
-                                .customerId(customerId))
-                        .build())
+        if (customerId == null || customerId.trim().isEmpty()) {
+            return executeUpdateWithRetry(cartId, cart ->
+                Mono.fromFuture(() -> apiRoot.carts()
+                    .withId(cartId)
+                    .post(CartUpdateBuilder.of()
+                            .version(cart.getVersion())
+                            .plusActions(actionBuilder -> actionBuilder.setCustomerIdBuilder()
+                                    .customerId(null))
+                            .build())
+                    .execute()
+                    .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+            );
+        }
+
+        return Mono.fromFuture(() -> apiRoot.customers()
+                .withId(customerId)
+                .get()
                 .execute()
                 .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
-        );
+                .flatMap(customer -> {
+                    String email = customer.getEmail();
+                    return executeUpdateWithRetry(cartId, cart ->
+                        Mono.fromFuture(() -> apiRoot.carts()
+                            .withId(cartId)
+                            .post(CartUpdateBuilder.of()
+                                    .version(cart.getVersion())
+                                    .plusActions(actionBuilder -> actionBuilder.setCustomerIdBuilder()
+                                            .customerId(customerId))
+                                    .plusActions(actionBuilder -> actionBuilder.setCustomerEmailBuilder()
+                                            .email(email))
+                                    .build())
+                            .execute()
+                            .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+                    );
+                })
+                .onErrorResume(throwable -> {
+                    return executeUpdateWithRetry(cartId, cart ->
+                        Mono.fromFuture(() -> apiRoot.carts()
+                            .withId(cartId)
+                            .post(CartUpdateBuilder.of()
+                                    .version(cart.getVersion())
+                                    .plusActions(actionBuilder -> actionBuilder.setCustomerIdBuilder()
+                                            .customerId(customerId))
+                                    .build())
+                            .execute()
+                            .thenApply(io.vrap.rmf.base.client.ApiHttpResponse::getBody))
+                    );
+                });
     }
 
     @Override
     public Mono<Cart> removeLineItem(String cartId, String lineItemId) {
-        return getCartById(cartId).flatMap(cart -> 
+        return executeUpdateWithRetry(cartId, cart ->
             Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()
@@ -137,7 +190,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Mono<Cart> addPayment(String cartId, String paymentId) {
-        return getCartById(cartId).flatMap(cart -> 
+        return executeUpdateWithRetry(cartId, cart ->
             Mono.fromFuture(() -> apiRoot.carts()
                 .withId(cartId)
                 .post(CartUpdateBuilder.of()

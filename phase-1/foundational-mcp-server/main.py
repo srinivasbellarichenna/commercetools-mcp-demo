@@ -418,6 +418,13 @@ async def place_order(cart_id: str, version: int) -> str:
             
             if cart_response.status_code == 200:
                 cart_data = cart_response.json()
+                if cart_data.get("cartState") == "Ordered":
+                    logger.info(f"Cart {cart_id} is already ordered. Checking for existing order...")
+                    existing_order = await _check_for_existing_order(cart_id)
+                    if existing_order:
+                        logger.info(f"Existing order found for cart {cart_id} during pre-check.")
+                        return json.dumps(existing_order, indent=2)
+                
                 payment_info = cart_data.get("paymentInfo")
                 if not payment_info or not payment_info.get("payments"):
                     logger.warning(f"Order blocking: No payment attached to cart {cart_id}")
@@ -505,7 +512,65 @@ async def update_customer_profile(customer_id: str, first_name: str = "", last_n
         logger.error(f"Error in update_customer_profile: {str(e)}")
         return f"Error updating customer profile for {customer_id}: {str(e)}"
 
+@mcp.tool()
+async def get_orders_by_customer(customer_id: str, limit: int = 10, offset: int = 0) -> str:
+    """
+    Retrieve a formatted list of orders placed by a specific customer, including line item details.
+    
+    Args:
+        customer_id: The unique identifier of the customer.
+        limit: Maximum number of orders to retrieve (default 10).
+        offset: Number of orders to skip (default 0).
+    """
+    logger.info(f"Tool Call: get_orders_by_customer(customer_id='{customer_id}', limit={limit}, offset={offset})")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            url = f"{API_BASE_URL}/orders/customer/{customer_id}"
+            params = {"limit": limit, "offset": offset}
+            logger.info(f"Backend Request: GET {url} params={params}")
+            
+            response = await client.get(url, params=params)
+            logger.info(f"Backend Response: Status={response.status_code}")
+            response.raise_for_status()
+            
+            data = response.json()
+            results = data.get("results", [])
+            
+            formatted_orders = []
+            for order in results:
+                line_items = []
+                for item in order.get("lineItems", []):
+                    product_name = "Artisanal Piece"
+                    name_field = item.get("name")
+                    if name_field:
+                        if isinstance(name_field, dict):
+                            product_name = name_field.get("en-US") or name_field.get("en-GB") or name_field.get("en") or list(name_field.values())[0]
+                        else:
+                            product_name = str(name_field)
+                            
+                    line_items.append({
+                        "product_name": product_name,
+                        "sku": item.get("variant", {}).get("sku") or item.get("sku") or "unknown-sku",
+                        "quantity": item.get("quantity", 1)
+                    })
+                
+                formatted_orders.append({
+                    "order_id": order.get("id"),
+                    "order_number": order.get("orderNumber") or order.get("id"),
+                    "created_at": order.get("createdAt"),
+                    "status": order.get("orderState") or "Open",
+                    "total_price": order.get("totalPrice", {}).get("centAmount") or 0,
+                    "line_items": line_items
+                })
+            
+            formatted_orders.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+            return json.dumps(formatted_orders, indent=2)
+    except Exception as e:
+        logger.error(f"Error in get_orders_by_customer: {str(e)}")
+        return f"Error retrieving customer orders: {str(e)}"
+
 if __name__ == "__main__":
     # When run directly (e.g. by Claude Desktop via stdio), mcp.run() handles everything.
     # In Docker, run_sse.py imports mcp and runs it via uvicorn.
     mcp.run()
+

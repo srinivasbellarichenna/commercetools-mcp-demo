@@ -16,6 +16,21 @@ const Checkout = () => {
   const [savePaymentMethod, setSavePaymentMethod] = useState(false);
   const navigate = useNavigate();
 
+  const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+
+  const showToast = (message, type = 'error') => {
+    setToast({ show: true, message, type });
+  };
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
+
   const [formData, setFormData] = useState({
     shippingAddress: {
       firstName: '',
@@ -76,15 +91,39 @@ const Checkout = () => {
     }));
   };
 
+  const validateAddress = (addr) => {
+    if (!addr.firstName?.trim()) return 'First name is required.';
+    if (!addr.lastName?.trim()) return 'Last name is required.';
+    if (!addr.streetName?.trim()) return 'Street name is required.';
+    if (!addr.streetNumber?.trim()) return 'House/Street number is required.';
+    if (!addr.city?.trim()) return 'City is required.';
+    if (!addr.postalCode?.trim()) return 'Postal code is required.';
+    
+    if (addr.country === 'DE' && !/^\d{5}$/.test(addr.postalCode)) {
+      return 'Postal code must be exactly 5 digits for Germany.';
+    }
+    
+    return null;
+  };
+
   const nextStep = async () => {
     if (step === 1) {
+      const err = validateAddress(formData.shippingAddress);
+      if (err) {
+        showToast(err);
+        return;
+      }
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-address`, {
+        const response = await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-address`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData.shippingAddress),
         });
+
+        if (!response.ok) {
+          throw new Error('Unable to set shipping address. Please check inputs.');
+        }
         
         if (saveToProfile && user) {
           await fetch(`${API_BASE_URL}/customers/${user.id}/addresses`, {
@@ -96,39 +135,60 @@ const Checkout = () => {
         }
 
         const res = await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-methods`);
+        if (!res.ok) {
+          throw new Error('Failed to load delivery methods.');
+        }
         const methods = await res.json();
         setShippingMethods(methods);
         setStep(2);
       } catch (e) {
+        showToast(e.message || "Failed to set shipping address");
         console.error("Failed to set shipping address", e);
       } finally {
         setLoading(false);
       }
     } else if (step === 2) {
+      const billingAddr = formData.sameAsShipping ? formData.shippingAddress : formData.billingAddress;
+      const err = validateAddress(billingAddr);
+      if (err) {
+        showToast(err);
+        return;
+      }
       setLoading(true);
       try {
-        const billingAddr = formData.sameAsShipping ? formData.shippingAddress : formData.billingAddress;
-        await fetch(`${API_BASE_URL}/carts/${cart.id}/billing-address`, {
+        const response = await fetch(`${API_BASE_URL}/carts/${cart.id}/billing-address`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(billingAddr),
         });
+        
+        if (!response.ok) {
+          throw new Error('Unable to set billing address.');
+        }
         setStep(3);
       } catch (e) {
+        showToast(e.message || "Failed to set billing address");
         console.error("Failed to set billing address", e);
       } finally {
         setLoading(false);
       }
     } else if (step === 3) {
-      if (!formData.shippingMethodId) return;
+      if (!formData.shippingMethodId) {
+        showToast('Please select a delivery method.');
+        return;
+      }
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-method?shippingMethodId=${formData.shippingMethodId}`, {
+        const response = await fetch(`${API_BASE_URL}/carts/${cart.id}/shipping-method?shippingMethodId=${formData.shippingMethodId}`, {
           method: 'POST',
         });
+        if (!response.ok) {
+          throw new Error('Failed to assign delivery method.');
+        }
         await refreshCart();
         setStep(4);
       } catch (e) {
+        showToast(e.message || "Failed to set shipping method");
         console.error("Failed to set shipping method", e);
       } finally {
         setLoading(false);
@@ -148,6 +208,9 @@ const Checkout = () => {
       const res = await fetch(`${API_BASE_URL}/payments/checkout?cartId=${cart.id}&successUrl=${encodeURIComponent(successUrl)}&cancelUrl=${encodeURIComponent(cancelUrl)}`, { 
         method: 'POST' 
       });
+      if (!res.ok) {
+        throw new Error('Checkout session creation failed.');
+      }
       const data = await res.json();
       if (data.url) {
         if (savePaymentMethod) {
@@ -156,8 +219,11 @@ const Checkout = () => {
           localStorage.removeItem('savePaymentPreference');
         }
         window.location.href = data.url;
+      } else {
+        throw new Error('Checkout URL not returned by payment service.');
       }
     } catch (e) {
+      showToast(e.message || "Failed to initiate payment");
       console.error("Payment initiation failed", e);
     } finally {
       setLoading(false);
@@ -260,7 +326,7 @@ const Checkout = () => {
                 <input type="text" placeholder="Street" name="streetName" value={formData.shippingAddress.streetName} onChange={(e) => handleInputChange(e, 'shippingAddress')} style={inputStyle} />
                 <input type="text" placeholder="House No." name="streetNumber" value={formData.shippingAddress.streetNumber} onChange={(e) => handleInputChange(e, 'shippingAddress')} style={inputStyle} />
                 <input type="text" placeholder="City" name="city" value={formData.shippingAddress.city} onChange={(e) => handleInputChange(e, 'shippingAddress')} style={inputStyle} />
-                <input type="text" placeholder="Postal Code" name="postalCode" value={formData.shippingAddress.postalCode} onChange={(e) => handleInputChange(e, 'shippingAddress')} style={inputStyle} />
+                <input type="text" placeholder="Postal Code (e.g. 10115)" name="postalCode" value={formData.shippingAddress.postalCode} onChange={(e) => handleInputChange(e, 'shippingAddress')} style={inputStyle} />
               </div>
 
               {user && (
@@ -270,7 +336,7 @@ const Checkout = () => {
                 </label>
               )}
 
-              <button className="btn-primary" style={{ marginTop: '3rem', width: '100%', padding: '1.4rem' }} onClick={nextStep} disabled={loading || !formData.shippingAddress.firstName || !formData.shippingAddress.city}>
+              <button className="btn-primary" style={{ marginTop: '3rem', width: '100%', padding: '1.4rem' }} onClick={nextStep} disabled={loading}>
                 {loading ? 'Processing...' : 'Proceed to Billing'}
               </button>
             </motion.div>
@@ -417,6 +483,42 @@ const Checkout = () => {
                   {loading ? 'Connecting to Vault...' : 'Initiate Secure Payment'}
                 </button>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Premium Sliding Toast Alerts */}
+        <AnimatePresence>
+          {toast.show && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.9 }}
+              style={{
+                position: 'fixed',
+                bottom: '2rem',
+                right: '2rem',
+                backgroundColor: toast.type === 'error' ? '#8a2b2b' : 'var(--bg-secondary)',
+                color: 'white',
+                padding: '1.2rem 2rem',
+                borderRadius: '12px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1.5rem',
+                zIndex: 1000,
+                fontFamily: 'var(--font-body)',
+                fontWeight: 500,
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}
+            >
+              <span>{toast.message}</span>
+              <button 
+                onClick={() => setToast(prev => ({ ...prev, show: false }))} 
+                style={{ background: 'none', border: 'none', color: 'white', opacity: 0.7, cursor: 'pointer', fontSize: '1rem', padding: 0 }}
+              >
+                ✕
+              </button>
             </motion.div>
           )}
         </AnimatePresence>

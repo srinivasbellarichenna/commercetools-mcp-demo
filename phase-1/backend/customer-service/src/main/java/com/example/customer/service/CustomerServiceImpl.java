@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 public class CustomerServiceImpl implements CustomerService {
 
     private final ProjectApiRoot apiRoot;
+    private final java.util.concurrent.atomic.AtomicReference<String> cachedTypeId = new java.util.concurrent.atomic.AtomicReference<>(null);
 
     @Override
     public Mono<CustomerSignInResult> registerCustomer(String email, String password, String firstName, String lastName) {
@@ -135,7 +136,16 @@ public class CustomerServiceImpl implements CustomerService {
         return ensureCustomTypeExists().then(getCustomerById(customerId)).flatMap(customer -> {
             String paymentData = String.format("{\"token\":\"%s\", \"last4\":\"%s\", \"brand\":\"%s\"}", paymentToken, last4, brand);
             
-            if (customer.getCustom() == null || !customer.getCustom().getType().getObj().getKey().equals("customer-extra-info")) {
+            boolean hasTargetType = false;
+            if (customer.getCustom() != null && customer.getCustom().getType() != null) {
+                String currentTypeId = customer.getCustom().getType().getId();
+                String targetTypeId = cachedTypeId.get();
+                if (currentTypeId != null && currentTypeId.equals(targetTypeId)) {
+                    hasTargetType = true;
+                }
+            }
+
+            if (!hasTargetType) {
                 return Mono.fromFuture(() -> apiRoot.customers()
                         .withId(customerId)
                         .post(CustomerUpdateBuilder.of()
@@ -162,7 +172,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private Mono<Void> ensureCustomTypeExists() {
+        if (cachedTypeId.get() != null) {
+            return Mono.empty();
+        }
         return Mono.fromFuture(() -> apiRoot.types().withKey("customer-extra-info").get().execute())
+                .map(response -> response.getBody().getId())
+                .doOnNext(cachedTypeId::set)
                 .then()
                 .onErrorResume(e -> {
                     LocalizedString name = LocalizedStringBuilder.of().addValue("en", "Customer Extra Info").build();
@@ -180,7 +195,10 @@ public class CustomerServiceImpl implements CustomerService {
                                                     .build()
                                     ))
                                     .build())
-                            .execute()).then();
+                            .execute())
+                            .map(response -> response.getBody().getId())
+                            .doOnNext(cachedTypeId::set)
+                            .then();
                 });
     }
 
