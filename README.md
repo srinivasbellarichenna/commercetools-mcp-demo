@@ -127,7 +127,7 @@ Resources that apply across the entire project:
 
 The **Foundation Layer** establishes the core transactional plumbing. In **Phase 2**, we will introduce a **Federated Multi-Agent Swarm** designed to handle complex, goal-oriented commerce workflows.
 
-Instead of a single agent executing simple tool calls, you will see a network of specialized agents—coordinating catalog discovery, budget constraints, shipping logistics, and item substitutions—collaborating autonomously to fulfill user goals (e.g., *"Find a matching running outfit under $150"*).
+Instead of a single agent executing simple tool calls, you will see a network of specialized agents—coordinating catalog discovery, budget constraints, shipping logistics, and item substitutions—collaborating autonomously to fulfill user goals.
 
 Star and Watch the repository to stay updated on the Phase 2 launch!
 
