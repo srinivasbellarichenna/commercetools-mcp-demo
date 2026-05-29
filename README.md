@@ -27,11 +27,26 @@ The Foundation Layer is divided into three primary domains. For an in-depth unde
 ### 📸 Visual Proof
 
 <div align="center">
-  <a href="https://youtu.be/I9nLHVyY9bQ">
-    <img src="https://img.shields.io/badge/▶_Click_to_Watch_Demo_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Video" />
-    <br/><br/>
-    <img src="https://img.youtube.com/vi/I9nLHVyY9bQ/maxresdefault.jpg?v=2" alt="Ecommerce Demo Video" style="max-width:100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" />
-  </a>
+  <table>
+    <tr>
+      <td align="center" width="50%" style="vertical-align: top;">
+        <b>🛒 Web Storefront Demo</b><br/><br/>
+        <a href="https://youtu.be/I9nLHVyY9bQ">
+          <img src="https://img.shields.io/badge/▶_Watch_Storefront_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Storefront Demo" />
+          <br/><br/>
+          <img src="https://img.youtube.com/vi/I9nLHVyY9bQ/maxresdefault.jpg?v=2" alt="Web Storefront Demo" style="max-width:100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" />
+        </a>
+      </td>
+      <td align="center" width="50%" style="vertical-align: top;">
+        <b>🤖 MCP Agent Demo</b><br/><br/>
+        <a href="https://youtu.be/waQ1Y4ZYDyo">
+          <img src="https://img.shields.io/badge/▶_Watch_MCP_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch MCP Demo" />
+          <br/><br/>
+          <img src="https://img.youtube.com/vi/waQ1Y4ZYDyo/maxresdefault.jpg?v=2" alt="MCP Agent Demo" style="max-width:100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" />
+        </a>
+      </td>
+    </tr>
+  </table>
 </div>
 
 ### 1. [Backend Microservices](./phase-1/backend)
