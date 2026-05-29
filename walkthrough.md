@@ -10,7 +10,7 @@ I have completed the full cleanup, security remediation, and configuration refin
 * **Test Isolation**: Removed hardcoded Commercetools credentials from `test_idempotency.py` and replaced them with `os.getenv` lookups (`CTP_PROJECT_KEY`, `CTP_CLIENT_ID`, etc.).
 * **Graceful Skippable Tests**: Configured all integration tests (`test_idempotency.py`, `test_contract.py`, `test_e2e_agent.py`, `test_get_orders.py`) to catch connection/credential errors and call `pytest.skip` rather than erroring out. Running `pytest` when offline now cleanly reports `6 skipped`.
 * > [!CAUTION]
-  > **Urgent Warning**: Although the exposed client secret `URnD9aB69DJRTcf5Q2yqyAvK9SSAjp2c` and Stripe keys are now removed from the repository, they have been tracked in git history. You **MUST** delete or rotate these keys inside the Commercetools Merchant Center and your Stripe Developer Dashboard to revoke them permanently.
+  > **Urgent Warning**: Although the exposed Commercetools client secret and Stripe keys are now removed from the repository, they have been tracked in git history. You **MUST** delete or rotate these keys inside the Commercetools Merchant Center and your Stripe Developer Dashboard to revoke them permanently.
 
 ### 2. Python Environment Optimization
 * **Pinned Dependencies**: Pinned explicit versions for the required Python libraries inside `requirements.txt` (`mcp`, `httpx`, `uvicorn`, `starlette`, `python-dotenv`, `pytest`, `pytest-asyncio`) to ensure installation reproducibility.
