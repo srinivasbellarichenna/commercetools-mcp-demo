@@ -4,9 +4,6 @@
 
 Welcome to **Composable Agentic Commerce**, a demonstration of Commercetools microservices integrated with autonomous AI agents via the Model Context Protocol (MCP).
 
-> [!WARNING]
-> **Demo Sandbox Disclaimer**: This project is built solely as a local developer demonstration and sandbox environment. While it showcases secure patterns like Stripe Checkout payment redirection to keep payment credentials out of the LLM agent's context, the backend microservice APIs (Customer, Cart, Order, Payment services) do not implement application-level user authentication or authorization. This codebase is **not** a production-ready commerce backend.
-
 This repository branch contains the **Foundation Layer** (Phase 1) of the architecture, which establishes the robust, scalable local microservice structure necessary to run demo e-commerce operations. It serves as the bedrock upon which the advanced AI orchestration (Phase 2) is built.
 
 ---
@@ -130,6 +127,11 @@ The **Foundation Layer** establishes the core transactional plumbing. In **Phase
 Instead of a single agent executing simple tool calls, you will see a network of specialized agents—coordinating catalog discovery, budget constraints, shipping logistics, and item substitutions—collaborating autonomously to fulfill user goals.
 
 Star and Watch the repository to stay updated on the Phase 2 launch!
+
+---
+
+### ⚠️ Sandbox Disclaimer
+This project is designed as a local developer sandbox. While it showcases secure patterns like Stripe Checkout redirection to keep payment credentials out of the LLM's context, the backend microservice APIs do not implement application-level user authentication or session authorization. It is intended for educational and local testing purposes.
 
 ---
 *Composable Agentic Commerce - Established 2026*
