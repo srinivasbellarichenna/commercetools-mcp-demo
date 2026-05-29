@@ -124,9 +124,15 @@ Resources that apply across the entire project:
 - **[Development Skills](./skills)**: Domain-specific resources for AI agents.
 
 ## 🚀 What's Next? (Phase 2 Teaser)
-The **Foundation Layer** you see here is just the beginning. 
 
-In **Phase 2**, we will be introducing **Federated Agent Swarms** (powered by LangGraph). Instead of a single LLM trying to do everything, you will see a network of specialized agents—a Product Specialist, a Returns Manager, and a Checkout Coordinator—collaborating autonomously to serve the customer. 
+The **Foundation Layer** establishes the core transactional plumbing. In **Phase 2**, we transition the architecture from a single-agent wrapper into a complete **Autonomous Commerce Infrastructure Platform**.
+
+We will be introducing a **Federated Multi-Agent Swarm** (orchestrated via LangGraph & Temporal) designed to coordinate complex, goal-oriented commerce tasks:
+
+- 🧠 **Shopper Memory & Goal Planning**: Moving from manual API calls to high-level objective decomposition (e.g., *"Restock my kitchen for the next two weeks under €150"*).
+- 🤝 **Collaborative Swarm Negotiation**: Specialized agents (**Catalog, Budget, Loyalty, Shipping, Substitution, and Trust Agents**) collaborating to optimize prices, delivery schedules, and substitutions.
+- 🛡️ **Enterprise-Grade Governance**: Policy-as-Code (using Open Policy Agent/Cedar) enforcing spending velocity controls, brand/category rules, and cryptographically signed purchasing mandates.
+- 🌐 **Universal Agent Gateway**: A protocol-agnostic gateway designed to interface with the OpenAI Operator ecosystem, Google Universal Commerce Protocol, and Shopify agent networks.
 
 Star and Watch the repository to stay updated on the Phase 2 launch!
 
