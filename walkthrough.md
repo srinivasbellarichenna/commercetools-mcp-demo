@@ -19,6 +19,7 @@ I have completed the full cleanup, security remediation, and configuration refin
 ### 3. Java Compilation & Lombok Compliance
 * **Maven Release Target**: Configured target `release` 17 in the parent `pom.xml` to guarantee bytecode consistency.
 * **Lombok Compiler Path**: Added explicit annotation processor paths in the `maven-compiler-plugin` configuration for parent build configs. This prevents Lombok compilation errors (such as missing `log` fields) when compiling on newer JDK versions (like Java 21).
+* **JDK Range Enforcer**: Integrated the `maven-enforcer-plugin` to restrict compilation to Java 17 up to 22 (`[17,23)`), preventing test-mocking failures on unsupported runtimes (like Java 23) while keeping local builds robust.
 
 ### 4. Docker Compose & Nginx Proxy Alignment
 * **Predictable Container Names**: Injected `container_name: foundational-mcp-server` under the service definition in `docker-compose.yml` to remove brittle directory-inferred naming.

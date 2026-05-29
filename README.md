@@ -89,7 +89,7 @@ cp .env.example .env
 Open the newly created `.env` file and securely input your Commercetools API and Stripe credentials.
 
 ### 2. Compile and Start Services
-First, compile the Java microservices. Then, use Docker Compose to containerize and spin up the Backend Microservices, Frontend React App, and the Foundational MCP Server all at once.
+First, compile the Java microservices (requires Java 17 to 22, with Java 17 recommended). Then, use Docker Compose to containerize and spin up the Backend Microservices, Frontend React App, and the Foundational MCP Server all at once.
 ```bash
 # Ensure you are inside the 'phase-1/backend' directory
 mvn clean package -DskipTests
