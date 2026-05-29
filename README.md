@@ -125,14 +125,9 @@ Resources that apply across the entire project:
 
 ## 🚀 What's Next? (Phase 2 Teaser)
 
-The **Foundation Layer** establishes the core transactional plumbing. In **Phase 2**, we transition the architecture from a single-agent wrapper into a complete **Autonomous Commerce Infrastructure Platform**.
+The **Foundation Layer** establishes the core transactional plumbing. In **Phase 2**, we will introduce a **Federated Multi-Agent Swarm** designed to handle complex, goal-oriented commerce workflows.
 
-We will be introducing a **Federated Multi-Agent Swarm** (orchestrated via LangGraph & Temporal) designed to coordinate complex, goal-oriented commerce tasks:
-
-- 🧠 **Shopper Memory & Goal Planning**: Moving from manual API calls to high-level objective decomposition (e.g., *"Restock my kitchen for the next two weeks under €150"*).
-- 🤝 **Collaborative Swarm Negotiation**: Specialized agents (**Catalog, Budget, Loyalty, Shipping, Substitution, and Trust Agents**) collaborating to optimize prices, delivery schedules, and substitutions.
-- 🛡️ **Enterprise-Grade Governance**: Policy-as-Code (using Open Policy Agent/Cedar) enforcing spending velocity controls, brand/category rules, and cryptographically signed purchasing mandates.
-- 🌐 **Universal Agent Gateway**: A protocol-agnostic gateway designed to interface with the OpenAI Operator ecosystem, Google Universal Commerce Protocol, and Shopify agent networks.
+Instead of a single agent executing simple tool calls, you will see a network of specialized agents—coordinating catalog discovery, budget constraints, shipping logistics, and item substitutions—collaborating autonomously to fulfill user goals (e.g., *"Find a matching running outfit under $150"*).
 
 Star and Watch the repository to stay updated on the Phase 2 launch!
 
