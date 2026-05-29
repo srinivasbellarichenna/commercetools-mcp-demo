@@ -6,13 +6,15 @@ import base64
 from main import place_order
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8085/api")
-PROJECT_KEY = "ct-mcp-demo"
-AUTH_URL = "https://auth.eu-central-1.aws.commercetools.com"
-API_URL = "https://api.eu-central-1.aws.commercetools.com"
-CLIENT_ID = "ErWaBCfIJIJIn6gljQnpZY_D"
-CLIENT_SECRET = "URnD9aB69DJRTcf5Q2yqyAvK9SSAjp2c"
+PROJECT_KEY = os.getenv("PROJECT_KEY") or os.getenv("CTP_PROJECT_KEY")
+AUTH_URL = os.getenv("AUTH_URL") or os.getenv("CTP_AUTH_URL", "https://auth.eu-central-1.aws.commercetools.com")
+API_URL = os.getenv("API_URL") or os.getenv("CTP_API_URL", "https://api.eu-central-1.aws.commercetools.com")
+CLIENT_ID = os.getenv("CLIENT_ID") or os.getenv("CTP_CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET") or os.getenv("CTP_CLIENT_SECRET")
 
 async def get_token(client: httpx.AsyncClient):
+    if not PROJECT_KEY or not CLIENT_ID or not CLIENT_SECRET:
+        raise ValueError("Missing Commercetools credentials in environment variables.")
     url = f"{AUTH_URL}/oauth/token"
     auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
     auth_b64 = base64.b64encode(auth_str.encode("utf-8")).decode("utf-8")
@@ -29,7 +31,12 @@ async def get_token(client: httpx.AsyncClient):
     return response.json()["access_token"]
 
 async def get_existing_cart_id_from_orders(client: httpx.AsyncClient):
-    token = await get_token(client)
+    if not PROJECT_KEY or not CLIENT_ID or not CLIENT_SECRET:
+        return None, None
+    try:
+        token = await get_token(client)
+    except Exception:
+        return None, None
     url = f"{API_URL}/{PROJECT_KEY}/orders?limit=1"
     response = await client.get(
         url,

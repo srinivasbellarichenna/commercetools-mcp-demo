@@ -112,6 +112,7 @@ services:
 
   foundational-mcp-server:
     build: ../foundational-mcp-server
+    container_name: foundational-mcp-server
     ports:
       - "8087:8000"
     networks:

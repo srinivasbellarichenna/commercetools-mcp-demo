@@ -4,7 +4,10 @@
 
 Welcome to **Composable Agentic Commerce**, a demonstration of Commercetools microservices integrated with autonomous AI agents via the Model Context Protocol (MCP).
 
-This repository branch contains the **Foundation Layer** (Phase 1) of the architecture, which establishes the robust, scalable, and secure infrastructure necessary to run modern e-commerce operations. It serves as the bedrock upon which the advanced AI orchestration (Phase 2) is built.
+> [!WARNING]
+> **Demo Sandbox Disclaimer**: This project is built solely as a local developer demonstration and sandbox environment. While it showcases secure patterns like Stripe Checkout payment redirection to keep payment credentials out of the LLM agent's context, the backend microservice APIs (Customer, Cart, Order, Payment services) do not implement application-level user authentication or authorization. This codebase is **not** a production-ready commerce backend.
+
+This repository branch contains the **Foundation Layer** (Phase 1) of the architecture, which establishes the robust, scalable local microservice structure necessary to run demo e-commerce operations. It serves as the bedrock upon which the advanced AI orchestration (Phase 2) is built.
 
 ---
 
@@ -12,7 +15,7 @@ This repository branch contains the **Foundation Layer** (Phase 1) of the archit
 
 - **Headless Commerce Engine**: Full integration with Commercetools APIs for catalog discovery, cart management, and order finalization.
 - **Microservice Architecture**: Decoupled Java Spring Boot microservices behind a unified API Gateway.
-- **Secure Payment Processing**: Seamless Stripe Checkout integration that keeps sensitive PCI-compliant data completely out of the AI's scope.
+- **Stripe Checkout Payment Handoff**: Stripe Checkout integration that keeps sensitive PCI-compliant data completely out of the AI's scope (local sandboxed flow).
 - **Model Context Protocol (MCP)**: A foundational Python FastMCP server that exposes deterministic e-commerce actions (tools) directly to AI models like Claude or Gemini.
 
 ---

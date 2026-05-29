@@ -43,7 +43,7 @@ gemini mcp add foundational-mcp \
 If you have spun up the entire foundation layer using `docker compose up -d`, you can attach Gemini directly to the running container without needing to configure Python on your host machine!
 
 ```bash
-gemini mcp add foundational-mcp docker -- exec -i backend-foundational-mcp-server-1 python main.py
+gemini mcp add foundational-mcp docker -- exec -i foundational-mcp-server python main.py
 ```
 
 Once registered, Gemini will now have access to tools like `search_products`, `initialize_cart`, and `create_stripe_checkout`.
@@ -92,7 +92,7 @@ If you have already spun up the entire foundation layer using `docker compose up
       "args": [
         "exec",
         "-i",
-        "backend-foundational-mcp-server-1",
+        "foundational-mcp-server",
         "python",
         "main.py"
       ]

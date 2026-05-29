@@ -90,8 +90,18 @@ const CheckoutSuccess = () => {
           const last4 = sessionData.payment_intent_data?.payment_method_options?.card?.last4 || '4242';
           const brand = sessionData.payment_intent_data?.payment_method_options?.card?.brand || 'visa';
           
-          const saveUrl = `${API_BASE_URL}/customers/${user.id}/payments?paymentToken=${sessionId}&last4=${last4}&brand=${brand}`;
-          const saveRes = await fetch(saveUrl, { method: 'POST' });
+          const saveUrl = `${API_BASE_URL}/customers/${user.id}/payment-methods`;
+          const saveRes = await fetch(saveUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              paymentToken: sessionId,
+              last4,
+              brand
+            })
+          });
           
           if (saveRes.ok) {
             console.log("✨ Payment method successfully vaulted.");

@@ -27,9 +27,18 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{customerEmail}}\",\n    \"password\": \"{{customerPassword}}\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\"\n}"
+						},
 						"url": {
-							"raw": "{{baseUrl}}/api/customers/register?email={{customerEmail}}&password={{customerPassword}}&firstName=John&lastName=Doe",
+							"raw": "{{baseUrl}}/api/customers/register",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -37,24 +46,6 @@
 								"api",
 								"customers",
 								"register"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "{{customerEmail}}"
-								},
-								{
-									"key": "password",
-									"value": "{{customerPassword}}"
-								},
-								{
-									"key": "firstName",
-									"value": "John"
-								},
-								{
-									"key": "lastName",
-									"value": "Doe"
-								}
 							]
 						}
 					},
@@ -78,9 +69,18 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{customerEmail}}\",\n    \"password\": \"{{customerPassword}}\"\n}"
+						},
 						"url": {
-							"raw": "{{baseUrl}}/api/customers/login?email={{customerEmail}}&password={{customerPassword}}",
+							"raw": "{{baseUrl}}/api/customers/login",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -88,16 +88,6 @@
 								"api",
 								"customers",
 								"login"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "{{customerEmail}}"
-								},
-								{
-									"key": "password",
-									"value": "{{customerPassword}}"
-								}
 							]
 						}
 					},

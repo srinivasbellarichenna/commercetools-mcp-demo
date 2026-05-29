@@ -14,9 +14,12 @@ async def test_e2e_agent_workflow():
     """
     async with httpx.AsyncClient() as client:
         # Step 1: Search Products
-        product_resp = await client.get(f"{API_BASE_URL}/products?limit=1")
-        if product_resp.status_code != 200:
-            pytest.skip("Backend not fully available or no products indexed. Skipping E2E.")
+        try:
+            product_resp = await client.get(f"{API_BASE_URL}/products?limit=1")
+            if product_resp.status_code != 200:
+                pytest.skip("Backend not fully available or no products indexed. Skipping E2E.")
+        except Exception:
+            pytest.skip("API Gateway not reachable. Backend services are offline.")
             
         products_data = product_resp.json()
         if not products_data or "results" not in products_data or len(products_data["results"]) == 0:

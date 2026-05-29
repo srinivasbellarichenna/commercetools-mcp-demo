@@ -16,7 +16,7 @@ The backend is composed of five distinct domain services and a unified API Gatew
 ## 🚀 Building and Running
 
 ### Prerequisites
-- Java 17
+- Java 17 (Recommended)
 - Maven
 - Docker & Docker Compose
 

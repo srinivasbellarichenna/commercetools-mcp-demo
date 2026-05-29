@@ -8,6 +8,9 @@ async def test_get_orders_by_customer():
     customer_id = "5d4e77af-b72e-42e0-81da-8532c5c3015a"
     result_str = await get_orders_by_customer(customer_id=customer_id, limit=2, offset=0)
     
+    if "All connection attempts failed" in result_str or "ConnectError" in result_str:
+        pytest.skip("Backend API Gateway not reachable. Skipping orders lookup test.")
+        
     # Assert it didn't fail
     assert not result_str.startswith("Error")
     
